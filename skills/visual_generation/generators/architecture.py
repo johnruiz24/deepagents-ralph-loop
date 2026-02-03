@@ -81,7 +81,7 @@ def _generate_comparison_diagram(
     from diagrams.generic.compute import Rack
     from diagrams.generic.database import SQL
     from diagrams.generic.network import Firewall
-    from diagrams.aws.analytics import DataLake
+    from diagrams.aws.storage import S3  # Use S3 instead of DataLake
     
     diagram_title = title or "Business Model Comparison"
     
@@ -109,7 +109,7 @@ def _generate_comparison_diagram(
                     left_components.append(Rack(comp))
             
             if left_components:
-                left_lake = DataLake("Integrated\nData Lake")
+                left_lake = S3("Integrated\nData Lake")
                 for comp in left_components:
                     comp >> Edge(color="#1976D2", style="bold") >> left_lake
         
