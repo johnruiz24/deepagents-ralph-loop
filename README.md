@@ -1,17 +1,10 @@
-# 🔥 InkForge
-
-```
-╔═══════════════════════════════════════════════════════════════╗
-║  ▀█▀ █▄ █ █▄▀ █▀▀ █▀█ █▀█ █▀▀ █▀▀                            ║
-║  ░█░ █░▀█ █░█ █▀░ █▄█ █▀▄ █▄█ ██▄                            ║
-║                                                               ║
-║  9-Agent • Skills-as-Tools • Dynamic Viz • HBR A+ Grade      ║
-╚═══════════════════════════════════════════════════════════════╝
-```
+# InkForge
 
 > **Agentic Newsletter Generation System for TUI Leadership**
 
 Transform strategic insights into HBR-quality newsletters with AI-powered research, dynamic visualization, and professional publishing.
+
+![9-Agent](https://img.shields.io/badge/Agents-9-blue) ![Skills](https://img.shields.io/badge/Skills--as--Tools-✓-green) ![HBR](https://img.shields.io/badge/HBR-A%2B%20Grade-red)
 
 ---
 
