@@ -1,0 +1,59 @@
+{
+  "research_queries": [
+    {
+      "query": "Universal Commerce Protocol UCP definition capabilities commerce infrastructure",
+      "purpose": "Understand UCP fundamentals and technical architecture",
+      "priority": 1
+    },
+    {
+      "query": "Agentic AI commerce protocols autonomous transactions machine-to-machine payments",
+      "purpose": "Explore how AI agents interact with commerce protocols",
+      "priority": 1
+    },
+    {
+      "query": "Travel technology distribution systems GDS NDC API-first architecture disruption",
+      "purpose": "Map current travel distribution landscape and evolution",
+      "priority": 2
+    },
+    {
+      "query": "TUI Group digital transformation strategy technology investments 2023 2024",
+      "purpose": "Understand TUI's current strategic positioning and tech initiatives",
+      "priority": 1
+    },
+    {
+      "query": "Commerce protocol standards interoperability payments authentication B2B B2C",
+      "purpose": "Analyze protocol-level commerce infrastructure trends",
+      "priority": 2
+    },
+    {
+      "query": "Travel industry intermediation disintermediation OTA direct booking agent-based booking",
+      "purpose": "Understand competitive dynamics in travel distribution",
+      "priority": 2
+    },
+    {
+      "query": "Machine-to-machine commerce autonomous agents enterprise adoption barriers opportunities",
+      "purpose": "Identify counterintuitive insights about agentic commerce adoption",
+      "priority": 1
+    },
+    {
+      "query": "Vertically integrated travel companies competitive advantage technology protocols",
+      "purpose": "Analyze implications for TUI's integrated business model",
+      "priority": 1
+    }
+  ],
+  "analysis_framework": {
+    "strategic_questions": [
+      "How does UCP shift power dynamics in travel distribution?",
+      "What counterintuitive advantages might TUI have in an agentic commerce world?",
+      "Where is conventional wisdom about travel technology wrong?",
+      "What must TUI do now to prepare for protocol-based commerce?",
+      "How does vertical integration interact with commerce protocols?"
+    ],
+    "hbr_insight_angles": [
+      "The protocol paradox: Why open standards might strengthen closed ecosystems",
+      "Agent economics: How AI intermediaries change margin structure",
+      "Trust architecture: Why commerce protocols require organizational transformation",
+      "The integration advantage: Why vertically integrated players win in protocol wars"
+    ]
+  }
+}
