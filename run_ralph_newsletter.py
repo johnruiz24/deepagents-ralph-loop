@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-InkForge Ralph Mode - Simplified Newsletter Generation
-Uses Claude Code's built-in capabilities for iterative execution.
+InkForge Ralph Mode - Newsletter Generation Workspace Initializer
+Sets up the workspace for iterative Ralph loop execution.
 """
 import os
 import sys
@@ -73,32 +73,32 @@ print("\n" + "="*60)
 print("RALPH MODE INSTRUCTIONS")
 print("="*60)
 print("""
-Para executar o Ralph Loop, use Claude Code com este prompt:
+To execute the Ralph Loop, use Claude Code with this prompt:
 
 ```
-Você é um agente Ralph Mode para geração de newsletters.
-Seu workspace é: /tmp/inkforge_ralph_newsletter
+You are a Ralph Mode agent for newsletter generation.
+Your workspace is: /tmp/inkforge_ralph_newsletter
 
-CADA ITERAÇÃO:
-1. Leia state.json para saber o stage atual
-2. Execute UMA unidade de trabalho
-3. Atualize state.json com progresso
-4. Adicione log em iteration_log.md
-5. Se completar, defina stage = "COMPLETED"
+EACH ITERATION:
+1. Read state.json to know the current stage
+2. Execute ONE unit of work
+3. Update state.json with progress
+4. Add log entry to iteration_log.md
+5. If complete, set stage = "COMPLETED"
 
 STAGES:
-- INITIALIZED → QUERY_FORMULATION (gerar queries de pesquisa)
-- QUERY_FORMULATION → RESEARCHING (simular pesquisa)
-- RESEARCHING → SYNTHESIZING (criar draft do artigo)
-- SYNTHESIZING → COMPLETED (finalizar)
+- INITIALIZED → QUERY_FORMULATION (generate research queries)
+- QUERY_FORMULATION → RESEARCHING (simulate research)
+- RESEARCHING → SYNTHESIZING (create article draft)
+- SYNTHESIZING → COMPLETED (finalize)
 
-Comece lendo o state.json e execute a primeira iteração.
+Start by reading state.json and execute the first iteration.
 ```
 
-O padrão Ralph garante que:
-- Cada iteração tem contexto fresco
-- Filesystem serve como memória
-- Se houver erro, auto-corrige na próxima iteração
+The Ralph pattern ensures:
+- Fresh context each iteration
+- Filesystem serves as memory
+- If there's an error, auto-correct in next iteration
 """)
 
-print("\n[READY] Workspace inicializado. Execute o prompt acima no Claude Code.")
+print("\n[READY] Workspace initialized. Execute the prompt above in Claude Code.")
