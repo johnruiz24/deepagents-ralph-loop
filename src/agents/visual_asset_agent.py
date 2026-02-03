@@ -135,55 +135,33 @@ class VisualAssetAgent(LLMAgent[VisualAssetInput, VisualAssetOutput]):
         )
 
     async def process(self, input_data: VisualAssetInput) -> VisualAssetOutput:
-        """Generate professional visual assets."""
-        self.logger.info("Starting PROFESSIONAL visual asset generation", topic=input_data.topic)
+        """Generate professional visual assets dynamically based on article content."""
+        self.logger.info("Starting DYNAMIC visual asset generation", topic=input_data.topic)
 
         assets = []
         failed = []
 
-        # 1. Generate Investment Comparison Chart (matplotlib + seaborn)
-        self.logger.info("Generating investment comparison chart...")
-        try:
-            asset = self._generate_investment_chart(input_data)
-            if asset:
-                assets.append(asset)
-                self.logger.info(f"Generated: {asset.filename} ({asset.quality_score:.0f}% quality)")
-        except Exception as e:
-            self.logger.warning(f"Investment chart failed: {e}")
-            failed.append(f"investment_chart: {e}")
+        # STEP 1: LLM analyzes article to identify visualization opportunities
+        self.logger.info("Analyzing article for visualization opportunities...")
+        opportunities = await self._analyze_visualization_opportunities(input_data)
 
-        # 2. Generate Market Trajectory Chart (matplotlib)
-        self.logger.info("Generating market trajectory chart...")
-        try:
-            asset = self._generate_trajectory_chart(input_data)
-            if asset:
-                assets.append(asset)
-                self.logger.info(f"Generated: {asset.filename} ({asset.quality_score:.0f}% quality)")
-        except Exception as e:
-            self.logger.warning(f"Trajectory chart failed: {e}")
-            failed.append(f"trajectory_chart: {e}")
+        if not opportunities:
+            self.logger.warning("No visualization opportunities identified, using defaults")
+            opportunities = self._get_default_opportunities(input_data)
 
-        # 3. Generate Architecture Diagram (diagrams library)
-        self.logger.info("Generating architecture diagram...")
-        try:
-            asset = self._generate_architecture_diagram(input_data)
-            if asset:
-                assets.append(asset)
-                self.logger.info(f"Generated: {asset.filename} ({asset.quality_score:.0f}% quality)")
-        except Exception as e:
-            self.logger.warning(f"Architecture diagram failed: {e}")
-            failed.append(f"architecture_diagram: {e}")
+        self.logger.info(f"Identified {len(opportunities)} visualization opportunities")
 
-        # 4. Generate Efficiency Comparison Chart
-        self.logger.info("Generating efficiency comparison chart...")
-        try:
-            asset = self._generate_efficiency_chart(input_data)
-            if asset:
-                assets.append(asset)
-                self.logger.info(f"Generated: {asset.filename} ({asset.quality_score:.0f}% quality)")
-        except Exception as e:
-            self.logger.warning(f"Efficiency chart failed: {e}")
-            failed.append(f"efficiency_chart: {e}")
+        # STEP 2: Generate each visualization
+        for i, opp in enumerate(opportunities[:self.MAX_ASSETS]):
+            self.logger.info(f"Generating visualization {i+1}: {opp.title} ({opp.type})")
+            try:
+                asset = await self._generate_from_opportunity(opp, input_data, i)
+                if asset:
+                    assets.append(asset)
+                    self.logger.info(f"Generated: {asset.filename} ({asset.quality_score:.0f}% quality)")
+            except Exception as e:
+                self.logger.warning(f"Visualization {i+1} failed: {e}")
+                failed.append(f"{opp.title}: {e}")
 
         # Create manifest
         manifest = {
@@ -250,6 +228,289 @@ class VisualAssetAgent(LLMAgent[VisualAssetInput, VisualAssetOutput]):
         avg_quality = sum(a.quality_score for a in output_data.assets) / len(output_data.assets)
         count_bonus = min(20, output_data.total_generated * 5)
         return min(100, avg_quality * 0.8 + count_bonus)
+
+    # ============== DYNAMIC VISUALIZATION METHODS ==============
+
+    async def _analyze_visualization_opportunities(
+        self, input_data: VisualAssetInput
+    ) -> list[VisualOpportunity]:
+        """Use LLM to analyze article and identify visualization opportunities."""
+        prompt = f"""Analyze this article and identify 3-5 visualization opportunities.
+
+ARTICLE TITLE: {input_data.article_title}
+TOPIC: {input_data.topic}
+
+ARTICLE CONTENT:
+{input_data.article_content[:4000]}
+
+For each visualization opportunity, provide:
+1. type: one of "comparison", "timeline", "architecture", "data"
+2. title: short title for the chart
+3. description: what it should show
+4. section: which article section it relates to
+5. data_points: list of specific numbers/entities to visualize (extract from article!)
+6. suggested_style: "horizontal_bar", "vertical_bar", "line", "area", "diagram"
+
+IMPORTANT: Extract ACTUAL data from the article. Do NOT make up numbers.
+If the article mentions "$50 billion market by 2027", use those exact numbers.
+
+Return as JSON array:
+[
+  {{
+    "type": "comparison",
+    "title": "Market Share Comparison",
+    "description": "Compare market positions of key players",
+    "section": "Core Analysis",
+    "data_points": ["Company A: $500M", "Company B: $300M"],
+    "suggested_style": "horizontal_bar"
+  }}
+]
+"""
+        try:
+            response = await self._llm.ainvoke(prompt)
+            content = response.content if hasattr(response, 'content') else str(response)
+
+            # Extract JSON from response
+            import re
+            json_match = re.search(r'\[[\s\S]*\]', content)
+            if json_match:
+                opportunities_data = json.loads(json_match.group())
+                return [
+                    VisualOpportunity(
+                        type=opp.get("type", "data"),
+                        title=opp.get("title", "Chart"),
+                        description=opp.get("description", ""),
+                        section=opp.get("section", ""),
+                        data_points=opp.get("data_points", []),
+                        suggested_style=opp.get("suggested_style", "horizontal_bar"),
+                    )
+                    for opp in opportunities_data
+                ]
+        except Exception as e:
+            self.logger.warning(f"LLM visualization analysis failed: {e}")
+
+        return []
+
+    def _get_default_opportunities(self, input_data: VisualAssetInput) -> list[VisualOpportunity]:
+        """Fallback: Generate generic opportunities based on topic keywords."""
+        opportunities = []
+        topic_lower = input_data.topic.lower()
+
+        # Always add a comparison chart
+        opportunities.append(VisualOpportunity(
+            type="comparison",
+            title=f"Key Players in {input_data.topic[:30]}",
+            description="Comparison of major entities discussed in the article",
+            section="Core Analysis",
+            data_points=["Entity A", "Entity B", "Entity C"],
+            suggested_style="horizontal_bar",
+        ))
+
+        # Add timeline if topic suggests temporal data
+        if any(word in topic_lower for word in ["trend", "growth", "market", "future", "2025", "2026", "2027"]):
+            opportunities.append(VisualOpportunity(
+                type="timeline",
+                title="Market Evolution Timeline",
+                description="Projected growth trajectory",
+                section="Strategic Implications",
+                data_points=["2024", "2025", "2026", "2027"],
+                suggested_style="line",
+            ))
+
+        # Add architecture if topic suggests systems/models
+        if any(word in topic_lower for word in ["model", "architecture", "system", "integration", "platform"]):
+            opportunities.append(VisualOpportunity(
+                type="architecture",
+                title="System Architecture Overview",
+                description="Key components and relationships",
+                section="Context Setting",
+                data_points=["Component A", "Component B", "Component C"],
+                suggested_style="diagram",
+            ))
+
+        return opportunities[:self.MAX_ASSETS]
+
+    async def _generate_from_opportunity(
+        self,
+        opportunity: VisualOpportunity,
+        input_data: VisualAssetInput,
+        index: int,
+    ) -> Optional[GeneratedAsset]:
+        """Generate a visualization from an identified opportunity."""
+        safe_title = "".join(c if c.isalnum() or c in "._- " else "_" for c in opportunity.title)[:40]
+        filename = f"chart_{index+1}_{safe_title.lower().replace(' ', '_')}.png"
+        file_path = self.shared_state.visuals_dir / filename
+
+        # Parse data points into structured data
+        data = await self._extract_chart_data(opportunity, input_data)
+
+        if opportunity.type == "timeline" or opportunity.suggested_style == "line":
+            return self._generate_timeline_from_data(data, opportunity, file_path)
+        elif opportunity.type == "architecture" or opportunity.suggested_style == "diagram":
+            return self._generate_architecture_from_data(data, opportunity, file_path)
+        else:
+            return self._generate_chart_from_data(data, opportunity, file_path)
+
+    async def _extract_chart_data(
+        self, opportunity: VisualOpportunity, input_data: VisualAssetInput
+    ) -> dict:
+        """Use LLM to extract structured chart data from opportunity."""
+        prompt = f"""Extract chart data from these data points for a {opportunity.suggested_style} chart.
+
+Title: {opportunity.title}
+Description: {opportunity.description}
+Raw data points: {opportunity.data_points}
+
+Article context (for verification):
+{input_data.article_content[:2000]}
+
+Return JSON with:
+- labels: list of category/entity names
+- values: list of numeric values (same order as labels)
+- xlabel: label for x-axis
+- ylabel: label for y-axis
+- highlight: which label to highlight (optional)
+
+Example:
+{{"labels": ["Company A", "Company B"], "values": [500, 300], "xlabel": "Investment ($M)", "highlight": "Company A"}}
+
+If you cannot extract numeric values, estimate reasonable ones based on context.
+Return ONLY the JSON object, no explanation.
+"""
+        try:
+            response = await self._llm.ainvoke(prompt)
+            content = response.content if hasattr(response, 'content') else str(response)
+
+            import re
+            json_match = re.search(r'\{[\s\S]*\}', content)
+            if json_match:
+                return json.loads(json_match.group())
+        except Exception as e:
+            self.logger.warning(f"Data extraction failed: {e}")
+
+        # Fallback: create dummy data
+        return {
+            "labels": opportunity.data_points[:5] if opportunity.data_points else ["A", "B", "C"],
+            "values": [100, 75, 50, 25, 10][:len(opportunity.data_points) or 3],
+            "xlabel": "Value",
+            "ylabel": "Category",
+        }
+
+    def _generate_chart_from_data(
+        self, data: dict, opportunity: VisualOpportunity, file_path: Path
+    ) -> Optional[GeneratedAsset]:
+        """Generate chart from extracted data."""
+        chart_type = "horizontal_bar" if opportunity.suggested_style in ["horizontal_bar", "bar"] else "vertical_bar"
+
+        result_path = self.tools["generate_chart"](
+            chart_type=chart_type,
+            data=data,
+            title=opportunity.title,
+            output_path=file_path,
+            subtitle=opportunity.description[:100] if opportunity.description else None,
+            highlight=data.get("highlight"),
+        )
+
+        if result_path and result_path.exists():
+            quality = self._validate_image_quality(result_path)
+            return GeneratedAsset(
+                filename=file_path.name,
+                type="chart",
+                title=opportunity.title,
+                description=opportunity.description,
+                file_path=result_path,
+                generation_method="skill:visual_generation.charts (dynamic)",
+                quality_score=quality,
+            )
+        return None
+
+    def _generate_timeline_from_data(
+        self, data: dict, opportunity: VisualOpportunity, file_path: Path
+    ) -> Optional[GeneratedAsset]:
+        """Generate timeline from extracted data."""
+        labels = data.get("labels", [])
+        values = data.get("values", [])
+
+        # Convert labels to years if they look like years
+        try:
+            years = [int(l) for l in labels if str(l).isdigit()]
+        except:
+            years = list(range(2024, 2024 + len(values)))
+
+        milestones = [
+            {"year": y, "value": v, "label": "" if i != len(years)//2 else "Key Point"}
+            for i, (y, v) in enumerate(zip(years, values))
+        ]
+
+        result_path = self.tools["generate_timeline"](
+            milestones=milestones,
+            output_path=file_path,
+            title=opportunity.title,
+            subtitle=opportunity.description[:100] if opportunity.description else None,
+        )
+
+        if result_path and result_path.exists():
+            quality = self._validate_image_quality(result_path)
+            return GeneratedAsset(
+                filename=file_path.name,
+                type="timeline",
+                title=opportunity.title,
+                description=opportunity.description,
+                file_path=result_path,
+                generation_method="skill:visual_generation.timelines (dynamic)",
+                quality_score=quality,
+            )
+        return None
+
+    def _generate_architecture_from_data(
+        self, data: dict, opportunity: VisualOpportunity, file_path: Path
+    ) -> Optional[GeneratedAsset]:
+        """Generate architecture diagram from extracted data."""
+        labels = data.get("labels", ["Component A", "Component B", "Component C"])
+
+        # Build entities for comparison diagram
+        mid = len(labels) // 2
+        entities = {
+            "left": {
+                "name": labels[0] if labels else "Model A",
+                "components": labels[1:mid+1] if len(labels) > 1 else ["Part 1", "Part 2"],
+            },
+            "right": {
+                "name": labels[mid+1] if len(labels) > mid+1 else "Model B",
+                "components": labels[mid+2:] if len(labels) > mid+2 else ["Part 3", "Part 4"],
+            }
+        }
+
+        original_cwd = os.getcwd()
+        os.chdir(self.shared_state.visuals_dir)
+
+        try:
+            result_path = self.tools["generate_architecture"](
+                diagram_type="comparison",
+                entities=entities,
+                output_path=file_path.stem,  # Without extension
+                title=opportunity.title,
+            )
+
+            if result_path and result_path.exists():
+                quality = self._validate_image_quality(result_path)
+                return GeneratedAsset(
+                    filename=result_path.name,
+                    type="architecture",
+                    title=opportunity.title,
+                    description=opportunity.description,
+                    file_path=result_path,
+                    generation_method="skill:visual_generation.architecture (dynamic)",
+                    quality_score=quality,
+                )
+        except Exception as e:
+            self.logger.warning(f"Architecture generation failed: {e}")
+        finally:
+            os.chdir(original_cwd)
+
+        return None
+
+    # ============== LEGACY METHODS (kept for backwards compatibility) ==============
 
     def _generate_investment_chart(self, input_data: VisualAssetInput) -> Optional[GeneratedAsset]:
         """Generate professional investment comparison chart using chart skill."""
