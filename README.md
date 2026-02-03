@@ -13,8 +13,9 @@ The Agent Newsletter System automates the entire newsletter production pipeline�
 ### Key Features
 
 - **9 Specialized AI Agents** working in orchestrated sequence
+- **Skills as Tools** - Modular, reusable skills that agents invoke
+- **Dynamic Visualization** - Charts generated based on article content (not hardcoded!)
 - **HBR-Quality Output** with professional charts, diagrams, and typography
-- **Vertical Integration Analysis** leveraging TUI's unique market position
 - **Multi-Modal Deliverables**: PDF, HTML, MP3 audio narration
 - **Quality Gates** ensuring editorial standards at each phase
 
@@ -44,27 +45,62 @@ The Agent Newsletter System automates the entire newsletter production pipeline�
                                 │
                                 ▼
                     ┌───────────────────┐
-                    │ SHARED STATE      │
-                    │ (File-based)      │
-                    │ • Research data   │
-                    │ • Content drafts  │
-                    │ • Visual assets   │
-                    │ • Final outputs   │
+                    │     SKILLS        │
+                    │  (Reusable Tools) │
+                    │ • visual_generation│
+                    │ • audio_generation │
+                    │ • pdf_generation   │
                     └───────────────────┘
 ```
 
-### Agent Descriptions
+---
 
-| # | Agent | Responsibility |
-|---|-------|----------------|
-| 1 | **Query Formulation** | Analyzes topic, generates targeted search queries |
-| 2 | **Parallelized Research** | Executes web searches, aggregates sources |
-| 3 | **TUI Strategy Analysis** | Contextualizes research for TUI's vertical integration |
-| 4 | **Synthesis & Narrative** | Crafts compelling narrative from research |
-| 5 | **HBR Style Editor** | Applies Harvard Business Review editorial standards |
-| 6 | **Visual Asset Generator** | Creates professional charts and diagrams |
-| 7 | **Multimedia Producer** | Generates audio narration (Amazon Polly/OpenAI TTS) |
-| 8 | **Final Assembly** | Compiles PDF, HTML, and ZIP deliverables |
+## Skills Architecture
+
+Skills are modular, reusable components that agents invoke as tools. This follows the **"Skills as Tools"** pattern.
+
+### Visual Generation Skill
+
+```
+skills/
+└── visual_generation/
+    ├── SKILL.md              # Documentation
+    ├── __init__.py           # Public exports
+    └── generators/
+        ├── charts.py         # matplotlib + seaborn (300 DPI)
+        ├── architecture.py   # diagrams library
+        └── timelines.py      # plotly
+```
+
+#### Available Tools
+
+| Tool | Description | Output |
+|------|-------------|--------|
+| `generate_chart()` | Bar, line, area charts | PNG (300 DPI) |
+| `generate_architecture()` | System/comparison diagrams | PNG (300 DPI) |
+| `generate_timeline()` | Market trajectories | PNG + HTML |
+
+#### Dynamic Generation Flow
+
+```
+Article Content
+      │
+      ▼
+┌─────────────────────────────────┐
+│ LLM: Analyze article            │
+│ → Identify visualization needs  │
+│ → Extract data from text        │
+└─────────────────────────────────┘
+      │
+      ▼
+┌─────────────────────────────────┐
+│ Skills: Generate visuals        │
+│ → Charts with extracted data    │
+│ → Diagrams based on content     │
+└─────────────────────────────────┘
+```
+
+**No hardcoded data!** Different topics produce different visualizations.
 
 ---
 
@@ -83,9 +119,12 @@ The Agent Newsletter System automates the entire newsletter production pipeline�
 git clone git@ssh.source.tui:ml-lab/incubator/agent-newsletter.git
 cd agent-newsletter
 
+# Checkout the skills branch
+git checkout feature/agentic-skills
+
 # Create virtual environment
 python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+source .venv/bin/activate
 
 # Install dependencies
 pip install -e ".[dev]"
@@ -99,34 +138,19 @@ cp .env.example .env
 
 ```bash
 # Run end-to-end newsletter generation
-python run_e2e_test.py
+PYTHONPATH=. python run_e2e_test.py
 
-# Or use the CLI
-python run_cli.py --topic "Your Newsletter Topic"
-```
+# Or with a custom topic
+PYTHONPATH=. python -c "
+import asyncio
+from src.orchestrator.orchestrator import generate_newsletter
 
----
-
-## Configuration
-
-### Environment Variables
-
-Create a `.env` file based on `.env.example`:
-
-```env
-# AWS Configuration (for Bedrock and Polly)
-AWS_REGION=eu-west-1
-AWS_PROFILE=default
-
-# Web Search
-TAVILY_API_KEY=your-tavily-api-key
-
-# Optional: OpenAI for TTS fallback
-OPENAI_API_KEY=your-openai-key
-
-# Optional: LangSmith observability
-LANGCHAIN_TRACING_V2=true
-LANGCHAIN_API_KEY=your-langsmith-key
+asyncio.run(generate_newsletter(
+    topic='Your Topic Here',
+    target_audience='TUI Leadership',
+    key_concepts=['Concept 1', 'Concept 2'],
+))
+"
 ```
 
 ---
@@ -149,19 +173,52 @@ output/
     │   ├── draft_article.md
     │   └── final_article.md
     ├── visuals/
-    │   ├── chart_*.png
-    │   └── diagram_*.png
+    │   ├── chart_1_*.png          # Dynamically named!
+    │   ├── chart_2_*.png
+    │   └── asset_manifest.json
     ├── multimedia/
     │   └── narration_*.mp3
     └── final_deliverables/
         ├── newsletter_*.pdf
         ├── newsletter_*.html
+        ├── *.png (copied visuals)
+        ├── *.mp3 (copied audio)
         └── newsletter_*.zip
 ```
 
 ---
 
+## Example Outputs
+
+### Test 1: "Universal Commerce Protocol"
+- 3 charts generated
+- PDF: 461 KB
+
+### Test 2: "The AI Paradox in Travel"
+- 4 charts generated (different content!)
+- PDF: 965 KB
+- Includes "Automation Paradox: Efficiency vs Customer Satisfaction" chart
+
+---
+
 ## Development
+
+### Project Structure
+
+```
+agent-newsletter/
+├── src/
+│   ├── agents/           # 8 specialized agents
+│   ├── orchestrator/     # Central workflow coordinator
+│   ├── state/            # Shared state management
+│   ├── quality_gates/    # Validation at each phase
+│   └── utils/            # Logging, Bedrock config
+├── skills/               # Reusable skill modules
+│   └── visual_generation/
+├── tests/                # Test suite
+├── docs/                 # Documentation
+└── output/               # Generated newsletters (gitignored)
+```
 
 ### Running Tests
 
@@ -183,42 +240,24 @@ ruff check src/
 mypy src/
 ```
 
-### Project Structure
-
-```
-agent-newsletter/
-├── src/
-│   ├── agents/           # 8 specialized agents
-│   ├── orchestrator/     # Central workflow coordinator
-│   ├── state/            # Shared state management
-│   ├── quality_gates/    # Validation at each phase
-│   ├── tools/            # Web search tools
-│   ├── config/           # Source configuration
-│   └── utils/            # Logging, Bedrock config
-├── tests/                # Test suite
-├── docs/                 # Documentation
-└── output/               # Generated newsletters (gitignored)
-```
-
----
-
-## Quality Standards
-
-The system enforces HBR-quality standards through quality gates:
-
-- **Research**: Minimum 5 credible sources, source diversity
-- **Content**: 1,500-2,500 words, readability scoring
-- **Production**: Professional visuals (300 DPI), embedded images
-
 ---
 
 ## Tech Stack
 
 - **LLM**: Claude via AWS Bedrock
-- **Orchestration**: [LangGraph](https://github.com/langchain-ai/langgraph)
-- **Visuals**: matplotlib, seaborn, [diagrams](https://diagrams.mingrammer.com/)
+- **Orchestration**: LangGraph
+- **Visuals**: matplotlib, seaborn, diagrams, plotly
 - **Audio**: Amazon Polly / OpenAI TTS
 - **PDF**: WeasyPrint
+
+---
+
+## Branches
+
+| Branch | Description |
+|--------|-------------|
+| `main` | Stable release |
+| `feature/agentic-skills` | Skills architecture + dynamic visualization |
 
 ---
 
