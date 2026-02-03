@@ -1,0 +1,7 @@
+/* HBR PDF Template CSS */
+body { font-family: 'Georgia', serif; }
+.title { font-size: 28pt; }
+.subtitle { font-size: 14pt; font-style: italic; }
+.sidebar { float: right; width: 30%; }
+.idea-in-brief { background-color: #f3f3f3; padding: 15px; }
+.pull-quote { border-left: 3px solid #ccc; padding-left: 10px; font-size: 14pt; }

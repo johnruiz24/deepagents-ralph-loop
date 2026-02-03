@@ -114,20 +114,44 @@ TONE_PASS_PROMPT = """You are an HBR editor performing a TONE pass on an article
 
 ## Your Task - TONE PASS
 
-Ensure the tone is HBR-appropriate:
-1. **Authoritative but not condescending**: Convey expertise without talking down
-2. **Sophisticated but not academic**: Precise language, avoid jargon overload
-3. **Confident but not dogmatic**: Clear point of view, acknowledge complexity
-4. **Engaging but not casual**: Lively prose, professional decorum
+Rewrite the article to adopt a PERSUASIVE, NARRATIVE-DRIVEN tone as required by HBR Writing Style Guide.
 
-## Specific Checks
-- Remove weak phrases ("I think", "it seems", "perhaps")
-- Strengthen passive voice to active where appropriate
-- Ensure first-person plural "we" is used sparingly and appropriately
-- Verify the opening hook is compelling
-- Check that conclusions are decisive, not hedging
+### The HBR Tone: The Persuasive Expert
+The tone should be that of a confident, experienced expert making a persuasive case to a peer:
+- **Authoritative, not arrogant**: Convey expertise without talking down
+- **Clear and direct, not simplistic**: Precise language, meaningful depth
+- **Evidence-backed, not just opinion**: Every claim supported
+- **Forward-looking and actionable**: Leaders can act on this
 
-Return the improved article with HBR-appropriate tone."""
+### KEY PRINCIPLE: Tell a Story
+Frame the analysis within a narrative that has:
+1. A clear problem (the hook)
+2. A turning point (the counterintuitive insight)
+3. A resolution (the strategic imperative)
+
+### Language Requirements
+- **Use strong, active verbs**: "This strategy drives growth" NOT "Growth is driven by this strategy"
+- **Avoid jargon**: If technical terms are necessary, explain them simply
+- **Be specific with concrete examples**: "reduces processing time by 40%" NOT "improves efficiency"
+
+### Structure of the Argument
+Ensure the article follows this arc:
+1. THE HOOK: Surprising statistic, provocative question, or compelling anecdote
+2. THE PROBLEM: Clear definition of the business challenge
+3. THE COUNTERINTUITIVE INSIGHT: Challenge conventional wisdom
+4. THE EVIDENCE: Data, case studies, logical reasoning
+5. THE STRATEGIC IMPLICATIONS: The "so what" for leaders
+6. THE ACTIONABLE RECOMMENDATIONS: Clear actions leaders can take
+7. THE CONCLUSION: Powerful, forward-looking statement
+
+### Specific Checks
+- Remove ALL weak phrases ("I think", "it seems", "perhaps", "might be", "could potentially")
+- Convert passive voice to active voice
+- Use provocative, attention-grabbing subheadings (NOT "Analysis" but "The Double-Edged Sword of Automation")
+- Ensure opening hook is compelling and specific
+- Make conclusions decisive and urgent, not hedging
+
+Return the improved article with persuasive, narrative-driven HBR tone."""
 
 
 FLOW_PASS_PROMPT = """You are an HBR editor performing a FLOW pass on an article.

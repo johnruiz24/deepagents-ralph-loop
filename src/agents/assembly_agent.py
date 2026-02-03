@@ -25,6 +25,12 @@ from typing import Optional
 from src.agents.base_agent import LLMAgent
 from src.state.shared_state import SharedState
 from src.utils.bedrock_config import create_bedrock_llm
+from src.utils.hbr_content_processor import (
+    generate_hbr_content,
+    format_idea_in_brief_html,
+    format_pull_quotes_html,
+    format_author_byline_html,
+)
 
 
 @dataclass
@@ -38,6 +44,11 @@ class AssemblyInput:
     visual_assets: list[dict]
     multimedia: dict
     tui_context: str
+    # HBR structural elements
+    idea_in_brief: Optional[dict] = None  # {problem, argument, solution}
+    pull_quotes: Optional[list[str]] = None
+    author_name: str = "TUI Strategy Group"
+    author_credentials: str = "Specialists in travel industry transformation and competitive strategy."
 
 
 @dataclass
@@ -77,7 +88,7 @@ class AssemblyOutput:
     assembly_status: dict
 
 
-# HTML Template
+# HTML Template - HBR Professional Style
 
 HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
@@ -92,12 +103,88 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             --text-color: #333;
             --bg-color: #FAFAFA;
             --accent-color: #E8F4F8;
+            --hbr-red: #C41E3A;
+            --sidebar-bg: #F5F5F5;
         }}
 
         * {{
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+        }}
+
+        /* HBR Author Byline */
+        .author-byline {{
+            text-align: center;
+            margin: 20px 0 40px 0;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }}
+        .author-byline .author-name {{
+            font-size: 1.1rem;
+            color: var(--text-color);
+            margin-bottom: 5px;
+        }}
+        .author-byline .author-credentials {{
+            font-size: 0.9rem;
+            color: #666;
+            font-style: italic;
+        }}
+
+        /* HBR Idea in Brief Sidebar */
+        .idea-in-brief {{
+            background: var(--sidebar-bg);
+            border-left: 4px solid var(--hbr-red);
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 0 8px 8px 0;
+        }}
+        .idea-in-brief h3 {{
+            color: var(--hbr-red);
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }}
+        .idea-in-brief .iib-section {{
+            margin-bottom: 15px;
+        }}
+        .idea-in-brief .iib-section:last-child {{
+            margin-bottom: 0;
+        }}
+        .idea-in-brief h4 {{
+            color: var(--primary-color);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }}
+        .idea-in-brief p {{
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 0;
+            text-align: left;
+        }}
+
+        /* HBR Pull Quotes */
+        .pull-quote {{
+            border-left: 4px solid var(--hbr-red);
+            padding: 20px 25px;
+            margin: 30px 0;
+            background: linear-gradient(to right, var(--sidebar-bg) 0%, transparent 100%);
+            font-size: 1.25rem;
+            font-style: italic;
+            color: var(--primary-color);
+            line-height: 1.5;
+        }}
+        .pull-quote::before {{
+            content: '"';
+            font-size: 3rem;
+            color: var(--hbr-red);
+            opacity: 0.3;
+            position: relative;
+            top: 15px;
+            left: -10px;
         }}
 
         body {{
@@ -271,8 +358,16 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     </header>
 
     <main class="container">
+        {author_byline}
+
+        {idea_in_brief}
+
         <article>
+            {pull_quote_1}
+
             {article_html}
+
+            {pull_quote_2}
         </article>
 
         {media_section}
@@ -349,6 +444,32 @@ class AssemblyAgent(LLMAgent[AssemblyInput, AssemblyOutput]):
         # Get TUI context
         tui_context = self.shared_state.read_tui_strategy_summary() or ""
 
+        # Generate HBR structural elements
+        self.logger.info("Generating HBR structural elements (Idea in Brief, Pull Quotes)")
+        try:
+            hbr_content = await generate_hbr_content(article_content)
+            idea_in_brief = {
+                "problem": hbr_content.idea_in_brief.problem,
+                "argument": hbr_content.idea_in_brief.argument,
+                "solution": hbr_content.idea_in_brief.solution,
+            }
+            pull_quotes = hbr_content.pull_quotes
+            author_name = hbr_content.author_name
+            author_credentials = hbr_content.author_credentials
+            self.logger.info(f"Generated {len(pull_quotes)} pull quotes")
+        except Exception as e:
+            self.logger.warning(f"HBR content generation failed: {e}, using defaults")
+            idea_in_brief = {
+                "problem": "Organizations face critical decisions about technology adoption.",
+                "argument": "Success requires balancing innovation with operational excellence.",
+                "solution": "Leaders must act decisively while maintaining strategic flexibility.",
+            }
+            pull_quotes = [
+                "The biggest risk isn't failing to adopt new technology—it's losing sight of what makes your business unique.",
+            ]
+            author_name = "TUI Strategy Group"
+            author_credentials = "Specialists in travel industry transformation and competitive strategy."
+
         return AssemblyInput(
             article_content=article_content,
             article_title=synthesized.get("title", state.get("topic", "")),
@@ -358,6 +479,10 @@ class AssemblyAgent(LLMAgent[AssemblyInput, AssemblyOutput]):
             visual_assets=state.get("visual_assets", []),
             multimedia=state.get("multimedia", {}),
             tui_context=tui_context,
+            idea_in_brief=idea_in_brief,
+            pull_quotes=pull_quotes,
+            author_name=author_name,
+            author_credentials=author_credentials,
         )
 
     async def process(self, input_data: AssemblyInput) -> AssemblyOutput:
@@ -615,12 +740,85 @@ class AssemblyAgent(LLMAgent[AssemblyInput, AssemblyOutput]):
             text-align: center;
             border-bottom: none;
         }}
+        /* HBR Elements for PDF */
+        .author-byline {{
+            text-align: center;
+            margin: 15pt 0 30pt 0;
+            padding-bottom: 15pt;
+            border-bottom: 1pt solid #ddd;
+        }}
+        .author-byline .author-name {{
+            font-size: 11pt;
+            color: #333;
+        }}
+        .author-byline .author-credentials {{
+            font-size: 9pt;
+            color: #666;
+            font-style: italic;
+        }}
+        .idea-in-brief {{
+            background: #F5F5F5;
+            border-left: 3pt solid #C41E3A;
+            padding: 15pt;
+            margin: 20pt 0;
+            page-break-inside: avoid;
+        }}
+        .idea-in-brief h3 {{
+            color: #C41E3A;
+            font-size: 12pt;
+            margin-bottom: 12pt;
+            text-transform: uppercase;
+            letter-spacing: 1pt;
+            border-bottom: none;
+        }}
+        .idea-in-brief h4 {{
+            color: #1E3A5F;
+            font-size: 9pt;
+            text-transform: uppercase;
+            margin-bottom: 3pt;
+            margin-top: 10pt;
+        }}
+        .idea-in-brief p {{
+            font-size: 10pt;
+            margin-bottom: 0;
+            text-align: left;
+        }}
+        .pull-quote {{
+            border-left: 3pt solid #C41E3A;
+            padding: 12pt 15pt;
+            margin: 20pt 0;
+            background: linear-gradient(to right, #F5F5F5 0%, transparent 100%);
+            font-size: 12pt;
+            font-style: italic;
+            color: #1E3A5F;
+        }}
     </style>
 </head>
 <body>
     <h1>{input_data.article_title}</h1>
     <p class="subtitle">{input_data.subtitle}</p>
+
+    <div class="author-byline">
+        <p class="author-name">by <strong>{input_data.author_name}</strong></p>
+        <p class="author-credentials">{input_data.author_credentials}</p>
+    </div>
+
+    <aside class="idea-in-brief">
+        <h3>Idea in Brief</h3>
+        <h4>THE PROBLEM</h4>
+        <p>{input_data.idea_in_brief.get('problem', '') if input_data.idea_in_brief else ''}</p>
+        <h4>THE ARGUMENT</h4>
+        <p>{input_data.idea_in_brief.get('argument', '') if input_data.idea_in_brief else ''}</p>
+        <h4>THE SOLUTION</h4>
+        <p>{input_data.idea_in_brief.get('solution', '') if input_data.idea_in_brief else ''}</p>
+    </aside>
+
+    {f'<blockquote class="pull-quote">"{input_data.pull_quotes[0]}"</blockquote>' if input_data.pull_quotes and len(input_data.pull_quotes) > 0 else ''}
+
     {html_content}
+
+    {f'<blockquote class="pull-quote">"{input_data.pull_quotes[1]}"</blockquote>' if input_data.pull_quotes and len(input_data.pull_quotes) > 1 else ''}
+
     {images_html}
 </body>
 </html>
@@ -781,6 +979,46 @@ class AssemblyAgent(LLMAgent[AssemblyInput, AssemblyOutput]):
         # Calculate reading time
         reading_time = max(1, input_data.word_count // 200)
 
+        # Build HBR structural elements HTML
+        from src.utils.hbr_content_processor import IdeaInBrief
+
+        # Author byline
+        author_byline_html = f"""
+        <div class="author-byline">
+            <p class="author-name">by <strong>{input_data.author_name}</strong></p>
+            <p class="author-credentials">{input_data.author_credentials}</p>
+        </div>
+        """
+
+        # Idea in Brief sidebar
+        iib = input_data.idea_in_brief or {}
+        idea_in_brief_html = f"""
+        <aside class="idea-in-brief">
+            <h3>Idea in Brief</h3>
+            <div class="iib-section">
+                <h4>THE PROBLEM</h4>
+                <p>{iib.get('problem', '')}</p>
+            </div>
+            <div class="iib-section">
+                <h4>THE ARGUMENT</h4>
+                <p>{iib.get('argument', '')}</p>
+            </div>
+            <div class="iib-section">
+                <h4>THE SOLUTION</h4>
+                <p>{iib.get('solution', '')}</p>
+            </div>
+        </aside>
+        """
+
+        # Pull quotes (distribute in article)
+        quotes = input_data.pull_quotes or []
+        pull_quote_1 = ""
+        pull_quote_2 = ""
+        if len(quotes) > 0:
+            pull_quote_1 = f'<blockquote class="pull-quote">"{quotes[0]}"</blockquote>'
+        if len(quotes) > 1:
+            pull_quote_2 = f'<blockquote class="pull-quote">"{quotes[1]}"</blockquote>'
+
         # Fill template
         html_content = HTML_TEMPLATE.format(
             title=input_data.article_title,
@@ -792,6 +1030,10 @@ class AssemblyAgent(LLMAgent[AssemblyInput, AssemblyOutput]):
             article_html=article_html,
             media_section=media_html,
             visuals_section="",  # Empty - images are inline now
+            author_byline=author_byline_html,
+            idea_in_brief=idea_in_brief_html,
+            pull_quote_1=pull_quote_1,
+            pull_quote_2=pull_quote_2,
         )
 
         # Save HTML

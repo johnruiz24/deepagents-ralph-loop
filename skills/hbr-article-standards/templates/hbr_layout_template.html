@@ -1,0 +1,43 @@
+<!-- HBR Layout Template -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="hbr_pdf_template.css">
+</head>
+<body>
+    <header>
+        <p class="running-header">{{ running_header }}</p>
+    </header>
+
+    <main>
+        <h1 class="title">{{ title }}</h1>
+        <p class="subtitle">{{ subtitle }}</p>
+        <div class="byline">
+            <p>by <strong>{{ author_name }}</strong></p>
+            <p class="author-credentials">{{ author_credentials }}</p>
+        </div>
+
+        <div class="content-wrapper">
+            <article class="main-content">
+                {{ article_content }}
+            </article>
+
+            <aside class="sidebar">
+                <div class="idea-in-brief">
+                    <h3>Idea in Brief</h3>
+                    <p><strong>The Problem:</strong> {{ idea_in_brief.problem }}</p>
+                    <p><strong>The Argument:</strong> {{ idea_in_brief.argument }}</p>
+                    <p><strong>The Solution:</strong> {{ idea_in_brief.solution }}</p>
+                </div>
+                
+                {{ pull_quotes }}
+            </aside>
+        </div>
+    </main>
+
+    <footer>
+        <p class="page-number">Page {{ page_number }} of {{ total_pages }}</p>
+    </footer>
+</body>
+</html>
