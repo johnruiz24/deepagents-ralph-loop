@@ -95,8 +95,14 @@ Focus on QUALITY over quantity. Each insight must be substantive and actionable.
 
 ARTICLE_STRUCTURE_PROMPT = """You are a Harvard Business Review editor creating an article structure.
 
-## Topic
+## Topic (STRICT ADHERENCE REQUIRED)
 {topic}
+
+CRITICAL: The article MUST be specifically about "{topic}".
+- The title MUST include the main topic keywords
+- Every section MUST directly address this topic
+- Do NOT drift to generic "business model" or "AI transformation" narratives
+- Stay laser-focused on the specific topic provided
 
 ## Target Audience
 {target_audience}
@@ -112,46 +118,97 @@ ARTICLE_STRUCTURE_PROMPT = """You are a Harvard Business Review editor creating 
 
 ## Article Structure Requirements
 
-Create a detailed outline following the HBR model. Target: 2100 words total.
+Create a detailed outline following the HBR model. Target: 2500-3000 words total.
 
-1. **THE HOOK (Opening)** - 230-270 words
+1. **THE HOOK (Opening)** - 250-300 words
    - Start with a compelling problem or opportunity
    - Make executives immediately see why this matters
-   - Preview your counterintuitive insight
+   - Preview the multi-dimensional framework
 
-2. **CONTEXT SETTING** - 280-320 words
+2. **CONTEXT SETTING** - 300-350 words
    - Background necessary to understand the topic
-   - Current state of play
+   - Current state of play at TUI
 
-3. **CORE ANALYSIS** - 900-1000 words (THE MEAT)
-   - Present your key insights with evidence
-   - Feature the counterintuitive findings prominently
-   - Connect to TUI strategic context
+3. **CORE ANALYSIS: MULTI-DIMENSIONAL EXPLORATION** - 1400-1700 words (THE MEAT)
 
-4. **STRATEGIC IMPLICATIONS** - 380-420 words
-   - What this means for TUI leadership
+   CRITICAL: Structure this section to explore 10-12 DISTINCT DIMENSIONS of the topic.
+   Each dimension should be a concrete, actionable aspect that TUI leadership can act upon.
+
+   For topics involving UCP + Data Quality, explore dimensions such as:
+   - Data Quality as UCP Foundation (why clean data is prerequisite)
+   - Unified Customer Profile (360° view across touchpoints)
+   - Cross-System Data Reconciliation (airlines, hotels, cruises, experiences)
+   - Real-Time Data Validation Architecture
+   - AI/ML Training Data Quality (better data = better models)
+   - Master Data Management (single source of truth)
+   - Data Governance Framework (policies, ownership, stewardship)
+   - Data Quality Metrics & KPIs (completeness, accuracy, timeliness)
+   - Legacy System Integration Challenges
+   - Partner/Supplier Data Quality
+   - Data Quality ROI & Business Case
+   - Competitive Moat through Data Excellence
+
+   For each dimension:
+   - Explain the concept clearly (2-3 sentences)
+   - Connect to TUI's specific context
+   - Provide actionable insight or recommendation
+
+   Use subheadings to organize the 10-12 dimensions clearly.
+
+4. **STRATEGIC IMPLICATIONS & ROADMAP** - 400-450 words
+   - Prioritized action items for TUI leadership
+   - Quick wins vs long-term investments
    - Specific, actionable recommendations
 
-5. **CONCLUSION** - 180-220 words
-   - Reinforce the counterintuitive insight
+5. **CONCLUSION** - 200-250 words
+   - Synthesize the multi-dimensional framework
    - Inspiring call to action
 
 ## Output Format
 Return a JSON outline:
 ```json
 {{
-  "title": "Compelling title (60-80 chars)",
-  "subtitle": "Elaboration (100-150 chars)",
+  "title": "Compelling title that MUST include topic keywords (60-80 chars)",
+  "subtitle": "Elaboration that reinforces the specific topic (100-150 chars)",
   "sections": [
     {{
       "name": "The Hook",
-      "target_words": 250,
+      "target_words": 280,
       "key_points": ["point1", "point2"],
       "insight_to_feature": "...",
       "opening_angle": "..."
     }},
+    {{
+      "name": "Context Setting",
+      "target_words": 320,
+      "key_points": ["current state", "why now"],
+      "insight_to_feature": "..."
+    }},
+    {{
+      "name": "Core Analysis: Multi-Dimensional Framework",
+      "target_words": 1600,
+      "key_points": ["List all 10-12 dimensions to explore"],
+      "dimensions": [
+        "Dimension 1: ...",
+        "Dimension 2: ...",
+        "... (list all 10-12)"
+      ],
+      "insight_to_feature": "..."
+    }},
+    {{
+      "name": "Strategic Implications & Roadmap",
+      "target_words": 420,
+      "key_points": ["quick wins", "long-term investments"],
+      "insight_to_feature": "..."
+    }},
+    {{
+      "name": "Conclusion",
+      "target_words": 220,
+      "key_points": ["synthesis", "call to action"],
+      "insight_to_feature": "..."
+    }}
   ],
-  "total_target_words": 2200
+  "total_target_words": 2840
 }}
 ```"""
 
@@ -162,6 +219,11 @@ ARTICLE_WRITING_PROMPT = """You are a Harvard Business Review writer. Your task 
 Title: {title}
 Topic: {topic}
 Target Audience: {target_audience}
+
+CRITICAL TOPIC ADHERENCE: This section MUST directly discuss "{topic}".
+- Use the topic keywords explicitly in the content
+- Every paragraph must connect back to the specific topic
+- Do NOT generalize to broader themes - stay specific to "{topic}"
 
 ## This Section
 Name: {section_name}
@@ -193,6 +255,14 @@ Insight to Feature: {insight_to_feature}
 - Include specific data points or examples
 - Write for busy executives who scan before reading deeply
 
+## MULTI-DIMENSIONAL EXPLORATION (for Core Analysis sections)
+If this is the Core Analysis section, you MUST:
+- Use clear subheadings (###) to organize different dimensions
+- Cover 10-12 distinct aspects/dimensions of the topic
+- Each dimension should have: concept explanation, TUI context, actionable insight
+- Ensure each dimension is concrete and actionable, not abstract
+- Make dimensions scannable - executives should grasp value quickly
+
 Write ONLY this section. No preamble. Start directly with compelling content."""
 
 
@@ -210,10 +280,11 @@ class SynthesisAgent(LLMAgent[SynthesisInput, DraftArticle]):
     agent_name = "SynthesisAgent"
     phase = "synthesis"
 
-    # Word count constraints (NON-NEGOTIABLE!)
-    MIN_WORDS = 2000
-    MAX_WORDS = 2500
-    TARGET_WORDS = 2200
+    # Word count constraints
+    # Extended for multi-dimensional exploration (10-12 dimensions)
+    MIN_WORDS = 2500
+    MAX_WORDS = 3500
+    TARGET_WORDS = 3000
 
     def __init__(self, shared_state: SharedState, **kwargs):
         super().__init__(shared_state, **kwargs)
@@ -320,9 +391,9 @@ class SynthesisAgent(LLMAgent[SynthesisInput, DraftArticle]):
         if len(output_data.sections) < 4:
             issues.append(f"Only {len(output_data.sections)} sections (need >= 4)")
 
-        # Reading time
-        if output_data.reading_time_minutes < 8 or output_data.reading_time_minutes > 12:
-            issues.append(f"Reading time {output_data.reading_time_minutes:.1f} min (target: 10 min)")
+        # Reading time (extended to 18 min for multi-dimensional exploration of 10-12 dimensions)
+        if output_data.reading_time_minutes < 8 or output_data.reading_time_minutes > 18:
+            issues.append(f"Reading time {output_data.reading_time_minutes:.1f} min (target: 12-16 min)")
 
         if issues:
             return False, f"Draft validation failed: {'; '.join(issues)}"

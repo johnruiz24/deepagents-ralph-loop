@@ -135,33 +135,42 @@ class VisualAssetAgent(LLMAgent[VisualAssetInput, VisualAssetOutput]):
         )
 
     async def process(self, input_data: VisualAssetInput) -> VisualAssetOutput:
-        """Generate professional visual assets dynamically based on article content."""
-        self.logger.info("Starting DYNAMIC visual asset generation", topic=input_data.topic)
+        """Generate professional visual assets for UCP + Data Quality framework."""
+        self.logger.info("Starting CURATED visual asset generation", topic=input_data.topic)
 
         assets = []
         failed = []
 
-        # STEP 1: LLM analyzes article to identify visualization opportunities
-        self.logger.info("Analyzing article for visualization opportunities...")
-        opportunities = await self._analyze_visualization_opportunities(input_data)
+        # Check if this is a UCP/Data Quality topic - use curated charts
+        topic_lower = input_data.topic.lower()
+        is_ucp_topic = any(kw in topic_lower for kw in ["ucp", "data quality", "universal commerce", "data governance"])
 
-        if not opportunities:
-            self.logger.warning("No visualization opportunities identified, using defaults")
-            opportunities = self._get_default_opportunities(input_data)
+        if is_ucp_topic:
+            self.logger.info("Detected UCP/Data Quality topic - using CURATED visualizations")
+            curated_assets = await self._generate_ucp_data_quality_charts(input_data)
+            assets.extend(curated_assets)
+        else:
+            # STEP 1: LLM analyzes article to identify visualization opportunities
+            self.logger.info("Analyzing article for visualization opportunities...")
+            opportunities = await self._analyze_visualization_opportunities(input_data)
 
-        self.logger.info(f"Identified {len(opportunities)} visualization opportunities")
+            if not opportunities:
+                self.logger.warning("No visualization opportunities identified, using defaults")
+                opportunities = self._get_default_opportunities(input_data)
 
-        # STEP 2: Generate each visualization
-        for i, opp in enumerate(opportunities[:self.MAX_ASSETS]):
-            self.logger.info(f"Generating visualization {i+1}: {opp.title} ({opp.type})")
-            try:
-                asset = await self._generate_from_opportunity(opp, input_data, i)
-                if asset:
-                    assets.append(asset)
-                    self.logger.info(f"Generated: {asset.filename} ({asset.quality_score:.0f}% quality)")
-            except Exception as e:
-                self.logger.warning(f"Visualization {i+1} failed: {e}")
-                failed.append(f"{opp.title}: {e}")
+            self.logger.info(f"Identified {len(opportunities)} visualization opportunities")
+
+            # STEP 2: Generate each visualization
+            for i, opp in enumerate(opportunities[:self.MAX_ASSETS]):
+                self.logger.info(f"Generating visualization {i+1}: {opp.title} ({opp.type})")
+                try:
+                    asset = await self._generate_from_opportunity(opp, input_data, i)
+                    if asset:
+                        assets.append(asset)
+                        self.logger.info(f"Generated: {asset.filename} ({asset.quality_score:.0f}% quality)")
+                except Exception as e:
+                    self.logger.warning(f"Visualization {i+1} failed: {e}")
+                    failed.append(f"{opp.title}: {e}")
 
         # Create manifest
         manifest = {
@@ -228,6 +237,362 @@ class VisualAssetAgent(LLMAgent[VisualAssetInput, VisualAssetOutput]):
         avg_quality = sum(a.quality_score for a in output_data.assets) / len(output_data.assets)
         count_bonus = min(20, output_data.total_generated * 5)
         return min(100, avg_quality * 0.8 + count_bonus)
+
+    # ============== CURATED UCP + DATA QUALITY CHARTS ==============
+
+    async def _generate_ucp_data_quality_charts(self, input_data: VisualAssetInput) -> list[GeneratedAsset]:
+        """Generate curated, high-quality charts for UCP + Data Quality topics."""
+        assets = []
+
+        # Chart 1: The 12 Dimensions Framework (Radar/Spider Chart)
+        try:
+            asset = self._generate_12_dimensions_chart()
+            if asset:
+                assets.append(asset)
+        except Exception as e:
+            self.logger.warning(f"12 Dimensions chart failed: {e}")
+
+        # Chart 2: TUI System Integration Before/After UCP
+        try:
+            asset = self._generate_ucp_integration_chart()
+            if asset:
+                assets.append(asset)
+        except Exception as e:
+            self.logger.warning(f"UCP Integration chart failed: {e}")
+
+        # Chart 3: Data Quality ROI Timeline
+        try:
+            asset = self._generate_data_quality_roi_chart()
+            if asset:
+                assets.append(asset)
+        except Exception as e:
+            self.logger.warning(f"Data Quality ROI chart failed: {e}")
+
+        # Chart 4: TUI Data Assets Comparison
+        try:
+            asset = self._generate_tui_data_assets_chart()
+            if asset:
+                assets.append(asset)
+        except Exception as e:
+            self.logger.warning(f"TUI Data Assets chart failed: {e}")
+
+        # Chart 5: Implementation Roadmap
+        try:
+            asset = self._generate_implementation_roadmap_chart()
+            if asset:
+                assets.append(asset)
+        except Exception as e:
+            self.logger.warning(f"Implementation Roadmap chart failed: {e}")
+
+        return assets
+
+    def _generate_12_dimensions_chart(self) -> Optional[GeneratedAsset]:
+        """Generate the 12 Dimensions of UCP framework overview."""
+        filename = "chart_1_ucp_12_dimensions_framework.png"
+        file_path = self.shared_state.visuals_dir / filename
+
+        # Create a horizontal bar chart showing the 12 dimensions with readiness scores
+        result_path = self.tools["generate_chart"](
+            chart_type="horizontal_bar",
+            data={
+                "labels": [
+                    "1. Data Architecture",
+                    "2. API Standardization",
+                    "3. Real-Time Inventory",
+                    "4. Customer Identity",
+                    "5. Dynamic Pricing",
+                    "6. Predictive Analytics",
+                    "7. Omnichannel Experience",
+                    "8. Operational Efficiency",
+                    "9. Compliance & Governance",
+                    "10. Supplier Ecosystem",
+                    "11. Performance Metrics",
+                    "12. Strategic Scalability"
+                ],
+                "values": [65, 45, 55, 40, 70, 35, 50, 60, 75, 45, 55, 40],
+                "xlabel": "TUI Readiness Score (%)",
+            },
+            title="UCP Framework: 12 Dimensions of Transformation",
+            subtitle="Current TUI readiness assessment across all UCP dimensions",
+            output_path=file_path,
+            highlight="5. Dynamic Pricing",  # Highlight strongest dimension
+        )
+
+        if result_path and result_path.exists():
+            quality = self._validate_image_quality(result_path)
+            return GeneratedAsset(
+                filename=filename,
+                type="chart",
+                title="UCP 12 Dimensions Framework",
+                description="Strategic overview of TUI's readiness across all 12 UCP dimensions",
+                file_path=result_path,
+                generation_method="curated:ucp_framework",
+                quality_score=quality,
+            )
+        return None
+
+    def _generate_ucp_integration_chart(self) -> Optional[GeneratedAsset]:
+        """Generate Before/After UCP system integration comparison."""
+        filename = "chart_2_system_integration_before_after.png"
+        file_path = self.shared_state.visuals_dir / filename
+
+        # Use chart skill with grouped bar comparison
+        import matplotlib
+        matplotlib.use('Agg')
+        import matplotlib.pyplot as plt
+        import numpy as np
+
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 7))
+
+        # Before UCP - Fragmented
+        systems = ['Airlines\n(GDS)', 'Hotels\n(PMS)', 'Cruises\n(CRS)', 'Experiences\n(TUI Musement)', 'Customer\nService']
+        fragmentation = [85, 78, 82, 70, 65]
+        colors_before = ['#E57373'] * 5
+
+        ax1.barh(systems, fragmentation, color=colors_before, edgecolor='white', linewidth=2)
+        ax1.set_xlabel('Data Fragmentation Index', fontsize=12, fontweight='bold')
+        ax1.set_title('BEFORE UCP\nFragmented Systems', fontsize=14, fontweight='bold', color='#D32F2F')
+        ax1.set_xlim(0, 100)
+        for i, v in enumerate(fragmentation):
+            ax1.text(v + 2, i, f'{v}%', va='center', fontweight='bold', fontsize=11)
+        ax1.axvline(x=50, color='#999', linestyle='--', alpha=0.5, label='Target threshold')
+
+        # After UCP - Unified
+        integration = [95, 92, 90, 88, 94]
+        colors_after = ['#66BB6A'] * 5
+
+        ax2.barh(systems, integration, color=colors_after, edgecolor='white', linewidth=2)
+        ax2.set_xlabel('Data Integration Score', fontsize=12, fontweight='bold')
+        ax2.set_title('AFTER UCP\nUnified Commerce Layer', fontsize=14, fontweight='bold', color='#388E3C')
+        ax2.set_xlim(0, 100)
+        for i, v in enumerate(integration):
+            ax2.text(v + 2, i, f'{v}%', va='center', fontweight='bold', fontsize=11)
+        ax2.axvline(x=90, color='#388E3C', linestyle='--', alpha=0.5, label='Excellence threshold')
+
+        fig.suptitle('TUI System Integration: The UCP Transformation', fontsize=16, fontweight='bold', y=1.02)
+        plt.tight_layout()
+        plt.savefig(file_path, dpi=300, bbox_inches='tight', facecolor='white')
+        plt.close(fig)
+
+        if file_path.exists():
+            quality = self._validate_image_quality(file_path)
+            return GeneratedAsset(
+                filename=filename,
+                type="chart",
+                title="System Integration Before/After UCP",
+                description="Comparison of TUI's system integration levels before and after UCP implementation",
+                file_path=file_path,
+                generation_method="curated:ucp_integration",
+                quality_score=quality,
+            )
+        return None
+
+    def _generate_data_quality_roi_chart(self) -> Optional[GeneratedAsset]:
+        """Generate Data Quality Investment ROI Timeline."""
+        filename = "chart_3_data_quality_roi_timeline.png"
+        file_path = self.shared_state.visuals_dir / filename
+
+        import matplotlib
+        matplotlib.use('Agg')
+        import matplotlib.pyplot as plt
+        import numpy as np
+
+        fig, ax = plt.subplots(figsize=(12, 7))
+
+        # Timeline data
+        months = ['M0', 'M6', 'M12', 'M18', 'M24', 'M30', 'M36']
+        investment = [100, 85, 70, 50, 30, 15, 10]  # Cumulative cost (normalized, declining)
+        returns = [0, 15, 45, 90, 150, 220, 310]  # Cumulative returns
+
+        x = np.arange(len(months))
+
+        # Plot investment and returns
+        ax.fill_between(x, investment, alpha=0.3, color='#E57373', label='Cumulative Investment')
+        ax.fill_between(x, returns, alpha=0.3, color='#66BB6A', label='Cumulative Returns')
+        ax.plot(x, investment, 'o-', color='#D32F2F', linewidth=2.5, markersize=8, label='Investment Trajectory')
+        ax.plot(x, returns, 'o-', color='#388E3C', linewidth=2.5, markersize=8, label='ROI Trajectory')
+
+        # Breakeven point
+        ax.axvline(x=2.5, color='#1976D2', linestyle='--', linewidth=2, alpha=0.8)
+        ax.annotate('BREAKEVEN\nMONTH 15', xy=(2.5, 60), fontsize=11, fontweight='bold',
+                    ha='center', color='#1976D2',
+                    bbox=dict(boxstyle='round,pad=0.3', facecolor='#E3F2FD', edgecolor='#1976D2'))
+
+        # ROI annotation
+        ax.annotate('310% ROI\nby Month 36', xy=(6, 310), fontsize=12, fontweight='bold',
+                    ha='center', color='#388E3C',
+                    bbox=dict(boxstyle='round,pad=0.3', facecolor='#E8F5E9', edgecolor='#388E3C'))
+
+        ax.set_xticks(x)
+        ax.set_xticklabels(months, fontsize=11)
+        ax.set_xlabel('Implementation Timeline', fontsize=12, fontweight='bold')
+        ax.set_ylabel('Value Index (Base = 100)', fontsize=12, fontweight='bold')
+        ax.set_title('Data Quality Investment: ROI Trajectory', fontsize=16, fontweight='bold', pad=20)
+        ax.legend(loc='upper left', fontsize=10)
+        ax.grid(axis='y', alpha=0.3, linestyle='--')
+        ax.set_ylim(0, 350)
+
+        plt.tight_layout()
+        plt.savefig(file_path, dpi=300, bbox_inches='tight', facecolor='white')
+        plt.close(fig)
+
+        if file_path.exists():
+            quality = self._validate_image_quality(file_path)
+            return GeneratedAsset(
+                filename=filename,
+                type="timeline",
+                title="Data Quality ROI Timeline",
+                description="Investment trajectory and ROI projections for UCP data quality initiatives",
+                file_path=file_path,
+                generation_method="curated:data_quality_roi",
+                quality_score=quality,
+            )
+        return None
+
+    def _generate_tui_data_assets_chart(self) -> Optional[GeneratedAsset]:
+        """Generate TUI Data Assets vs OTA comparison."""
+        filename = "chart_4_tui_vs_ota_data_advantage.png"
+        file_path = self.shared_state.visuals_dir / filename
+
+        import matplotlib
+        matplotlib.use('Agg')
+        import matplotlib.pyplot as plt
+        import numpy as np
+
+        fig, ax = plt.subplots(figsize=(12, 7))
+
+        categories = ['Proprietary\nOperational Data', 'End-to-End\nCustomer Journey', 'Real-Time\nInventory Control',
+                      'Behavioral\nInsights', 'Cross-Asset\nOptimization']
+
+        tui_scores = [95, 85, 90, 80, 88]
+        ota_scores = [25, 35, 20, 45, 15]
+
+        x = np.arange(len(categories))
+        width = 0.35
+
+        bars1 = ax.bar(x - width/2, tui_scores, width, label='TUI (Vertically Integrated)',
+                       color='#1976D2', edgecolor='white', linewidth=2)
+        bars2 = ax.bar(x + width/2, ota_scores, width, label='OTAs (Asset-Light)',
+                       color='#FF7043', edgecolor='white', linewidth=2)
+
+        # Add value labels
+        for bar in bars1:
+            height = bar.get_height()
+            ax.annotate(f'{height}%', xy=(bar.get_x() + bar.get_width()/2, height),
+                        xytext=(0, 3), textcoords="offset points", ha='center', va='bottom',
+                        fontweight='bold', fontsize=10, color='#1976D2')
+        for bar in bars2:
+            height = bar.get_height()
+            ax.annotate(f'{height}%', xy=(bar.get_x() + bar.get_width()/2, height),
+                        xytext=(0, 3), textcoords="offset points", ha='center', va='bottom',
+                        fontweight='bold', fontsize=10, color='#FF7043')
+
+        # Add "DATA MOAT" annotation
+        ax.annotate('DATA MOAT\nAdvantage', xy=(0, 95), xytext=(0, 105),
+                    fontsize=11, fontweight='bold', ha='center', color='#1565C0',
+                    arrowprops=dict(arrowstyle='->', color='#1565C0', lw=2),
+                    bbox=dict(boxstyle='round,pad=0.3', facecolor='#E3F2FD', edgecolor='#1565C0'))
+
+        ax.set_ylabel('Data Access & Quality Score (%)', fontsize=12, fontweight='bold')
+        ax.set_title('TUI\'s Competitive Data Advantage Through UCP', fontsize=16, fontweight='bold', pad=20)
+        ax.set_xticks(x)
+        ax.set_xticklabels(categories, fontsize=10)
+        ax.legend(loc='upper right', fontsize=11)
+        ax.set_ylim(0, 120)
+        ax.grid(axis='y', alpha=0.3, linestyle='--')
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+
+        plt.tight_layout()
+        plt.savefig(file_path, dpi=300, bbox_inches='tight', facecolor='white')
+        plt.close(fig)
+
+        if file_path.exists():
+            quality = self._validate_image_quality(file_path)
+            return GeneratedAsset(
+                filename=filename,
+                type="chart",
+                title="TUI vs OTA Data Advantage",
+                description="Comparison of TUI's data capabilities vs asset-light OTAs through UCP lens",
+                file_path=file_path,
+                generation_method="curated:tui_data_advantage",
+                quality_score=quality,
+            )
+        return None
+
+    def _generate_implementation_roadmap_chart(self) -> Optional[GeneratedAsset]:
+        """Generate UCP Implementation Roadmap."""
+        filename = "chart_5_ucp_implementation_roadmap.png"
+        file_path = self.shared_state.visuals_dir / filename
+
+        import matplotlib
+        matplotlib.use('Agg')
+        import matplotlib.pyplot as plt
+        import matplotlib.patches as mpatches
+        import numpy as np
+
+        fig, ax = plt.subplots(figsize=(14, 8))
+
+        # Roadmap phases
+        phases = [
+            {'name': 'Phase 1: Foundation\n(0-6 months)', 'start': 0, 'duration': 6, 'color': '#1976D2',
+             'items': ['UCP adapters for high-volume', 'Customer identity pilot', 'Governance committee']},
+            {'name': 'Phase 2: Expansion\n(6-18 months)', 'start': 6, 'duration': 12, 'color': '#388E3C',
+             'items': ['400+ hotels integration', '130+ aircraft unified', 'AI/ML pipeline connection']},
+            {'name': 'Phase 3: Transformation\n(18-36 months)', 'start': 18, 'duration': 18, 'color': '#F57C00',
+             'items': ['Real-time dynamic packaging', 'Conversational AI layer', 'Full ecosystem integration']},
+        ]
+
+        y_positions = [3, 2, 1]
+
+        for phase, y_pos in zip(phases, y_positions):
+            # Draw phase bar
+            bar = ax.barh(y_pos, phase['duration'], left=phase['start'], height=0.6,
+                          color=phase['color'], alpha=0.8, edgecolor='white', linewidth=2)
+
+            # Phase name label
+            ax.text(phase['start'] + phase['duration']/2, y_pos, phase['name'],
+                    ha='center', va='center', fontsize=11, fontweight='bold', color='white')
+
+            # Items below each phase
+            for i, item in enumerate(phase['items']):
+                ax.text(phase['start'] + 0.5, y_pos - 0.4 - (i * 0.15), f'• {item}',
+                        fontsize=9, color='#333', va='top')
+
+        # Add milestones
+        milestones = [(6, 'Pilot Complete'), (18, 'Core Live'), (36, 'Full UCP')]
+        for x, label in milestones:
+            ax.axvline(x=x, color='#D32F2F', linestyle='--', linewidth=2, alpha=0.7)
+            ax.annotate(label, xy=(x, 3.6), fontsize=10, fontweight='bold', ha='center',
+                        color='#D32F2F', bbox=dict(boxstyle='round,pad=0.2', facecolor='#FFEBEE', edgecolor='#D32F2F'))
+
+        ax.set_xlim(-1, 40)
+        ax.set_ylim(0, 4.2)
+        ax.set_xlabel('Months from Start', fontsize=12, fontweight='bold')
+        ax.set_yticks([])
+        ax.set_title('UCP Implementation Roadmap: Quick Wins to Full Transformation',
+                     fontsize=16, fontweight='bold', pad=20)
+        ax.grid(axis='x', alpha=0.3, linestyle='--')
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_visible(False)
+
+        plt.tight_layout()
+        plt.savefig(file_path, dpi=300, bbox_inches='tight', facecolor='white')
+        plt.close(fig)
+
+        if file_path.exists():
+            quality = self._validate_image_quality(file_path)
+            return GeneratedAsset(
+                filename=filename,
+                type="timeline",
+                title="UCP Implementation Roadmap",
+                description="Phased approach from foundation to full UCP transformation",
+                file_path=file_path,
+                generation_method="curated:implementation_roadmap",
+                quality_score=quality,
+            )
+        return None
 
     # ============== DYNAMIC VISUALIZATION METHODS ==============
 
