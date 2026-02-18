@@ -135,42 +135,35 @@ class VisualAssetAgent(LLMAgent[VisualAssetInput, VisualAssetOutput]):
         )
 
     async def process(self, input_data: VisualAssetInput) -> VisualAssetOutput:
-        """Generate professional visual assets for UCP + Data Quality framework."""
-        self.logger.info("Starting CURATED visual asset generation", topic=input_data.topic)
+        """Generate professional visual assets dynamically for ANY topic."""
+        self.logger.info("Starting ADAPTIVE visual asset generation", topic=input_data.topic)
 
         assets = []
         failed = []
 
-        # Check if this is a UCP/Data Quality topic - use curated charts
-        topic_lower = input_data.topic.lower()
-        is_ucp_topic = any(kw in topic_lower for kw in ["ucp", "data quality", "universal commerce", "data governance"])
+        # STEP 1: Extract structured data from article using LLM
+        self.logger.info("Extracting chart data from article content...")
+        chart_data = await self._extract_article_chart_data(input_data)
 
-        if is_ucp_topic:
-            self.logger.info("Detected UCP/Data Quality topic - using CURATED visualizations")
-            curated_assets = await self._generate_ucp_data_quality_charts(input_data)
-            assets.extend(curated_assets)
-        else:
-            # STEP 1: LLM analyzes article to identify visualization opportunities
-            self.logger.info("Analyzing article for visualization opportunities...")
-            opportunities = await self._analyze_visualization_opportunities(input_data)
+        # STEP 2: Generate 5 strategic charts using templates + extracted data
+        chart_generators = [
+            ("framework_dimensions", self._generate_framework_chart),
+            ("transformation_comparison", self._generate_transformation_chart),
+            ("roi_timeline", self._generate_roi_timeline_chart),
+            ("competitive_advantage", self._generate_competitive_chart),
+            ("implementation_roadmap", self._generate_roadmap_chart),
+        ]
 
-            if not opportunities:
-                self.logger.warning("No visualization opportunities identified, using defaults")
-                opportunities = self._get_default_opportunities(input_data)
-
-            self.logger.info(f"Identified {len(opportunities)} visualization opportunities")
-
-            # STEP 2: Generate each visualization
-            for i, opp in enumerate(opportunities[:self.MAX_ASSETS]):
-                self.logger.info(f"Generating visualization {i+1}: {opp.title} ({opp.type})")
-                try:
-                    asset = await self._generate_from_opportunity(opp, input_data, i)
-                    if asset:
-                        assets.append(asset)
-                        self.logger.info(f"Generated: {asset.filename} ({asset.quality_score:.0f}% quality)")
-                except Exception as e:
-                    self.logger.warning(f"Visualization {i+1} failed: {e}")
-                    failed.append(f"{opp.title}: {e}")
+        for i, (chart_type, generator) in enumerate(chart_generators):
+            self.logger.info(f"Generating chart {i+1}/5: {chart_type}")
+            try:
+                asset = await generator(input_data, chart_data, i)
+                if asset:
+                    assets.append(asset)
+                    self.logger.info(f"Generated: {asset.filename} ({asset.quality_score:.0f}% quality)")
+            except Exception as e:
+                self.logger.warning(f"Chart {chart_type} failed: {e}")
+                failed.append(f"{chart_type}: {e}")
 
         # Create manifest
         manifest = {
@@ -238,84 +231,183 @@ class VisualAssetAgent(LLMAgent[VisualAssetInput, VisualAssetOutput]):
         count_bonus = min(20, output_data.total_generated * 5)
         return min(100, avg_quality * 0.8 + count_bonus)
 
-    # ============== CURATED UCP + DATA QUALITY CHARTS ==============
+    # ============== ADAPTIVE CHART GENERATION ==============
 
-    async def _generate_ucp_data_quality_charts(self, input_data: VisualAssetInput) -> list[GeneratedAsset]:
-        """Generate curated, high-quality charts for UCP + Data Quality topics."""
-        assets = []
+    async def _extract_article_chart_data(self, input_data: VisualAssetInput) -> dict:
+        """Use LLM to extract structured chart data from article content."""
+        prompt = f"""Analyze this strategic article and extract data for 5 professional charts.
 
-        # Chart 1: The 12 Dimensions Framework (Radar/Spider Chart)
+ARTICLE TITLE: {input_data.article_title}
+TOPIC: {input_data.topic}
+TARGET AUDIENCE: TUI Leadership
+
+ARTICLE CONTENT:
+{input_data.article_content[:6000]}
+
+Extract the following data structures. Use ACTUAL content from the article.
+If specific numbers aren't mentioned, make reasonable estimates based on context.
+
+Return JSON:
+{{
+    "topic_short": "3-5 word summary of main topic",
+    "company": "main company discussed (e.g., TUI)",
+
+    "dimensions": {{
+        "title": "Framework name (e.g., 'Digital Transformation Framework')",
+        "items": [
+            {{"name": "Dimension 1 name", "score": 65, "description": "brief desc"}},
+            {{"name": "Dimension 2 name", "score": 45, "description": "brief desc"}}
+        ]
+    }},
+
+    "transformation": {{
+        "title": "What is being transformed",
+        "before_label": "Current State",
+        "after_label": "Target State",
+        "categories": ["Category 1", "Category 2", "Category 3", "Category 4", "Category 5"],
+        "before_values": [85, 78, 82, 70, 65],
+        "after_values": [95, 92, 90, 88, 94]
+    }},
+
+    "timeline": {{
+        "title": "Investment/Implementation Timeline",
+        "breakeven_month": 15,
+        "total_months": 36,
+        "roi_percentage": 310
+    }},
+
+    "competitive": {{
+        "title": "Competitive Advantage Analysis",
+        "protagonist": "TUI",
+        "competitor": "Competitors",
+        "categories": ["Advantage 1", "Advantage 2", "Advantage 3", "Advantage 4", "Advantage 5"],
+        "protagonist_scores": [95, 85, 90, 80, 88],
+        "competitor_scores": [25, 35, 20, 45, 15],
+        "moat_label": "Key Advantage"
+    }},
+
+    "roadmap": {{
+        "title": "Implementation Roadmap",
+        "phases": [
+            {{"name": "Phase 1: Foundation", "duration": 6, "items": ["Item 1", "Item 2", "Item 3"]}},
+            {{"name": "Phase 2: Expansion", "duration": 12, "items": ["Item 1", "Item 2", "Item 3"]}},
+            {{"name": "Phase 3: Transformation", "duration": 18, "items": ["Item 1", "Item 2", "Item 3"]}}
+        ],
+        "milestones": [
+            {{"month": 6, "label": "Pilot Complete"}},
+            {{"month": 18, "label": "Core Live"}},
+            {{"month": 36, "label": "Full Rollout"}}
+        ]
+    }}
+}}
+
+Extract REAL dimensions, categories, and phases from the article content.
+Make the data specific to the actual topic discussed, not generic.
+"""
         try:
-            asset = self._generate_12_dimensions_chart()
-            if asset:
-                assets.append(asset)
+            response = await self._llm.ainvoke(prompt)
+            content = response.content if hasattr(response, 'content') else str(response)
+
+            import re
+            json_match = re.search(r'\{[\s\S]*\}', content)
+            if json_match:
+                data = json.loads(json_match.group())
+                self.logger.info(f"Extracted chart data for topic: {data.get('topic_short', 'unknown')}")
+                return data
         except Exception as e:
-            self.logger.warning(f"12 Dimensions chart failed: {e}")
+            self.logger.warning(f"Chart data extraction failed: {e}")
 
-        # Chart 2: TUI System Integration Before/After UCP
-        try:
-            asset = self._generate_ucp_integration_chart()
-            if asset:
-                assets.append(asset)
-        except Exception as e:
-            self.logger.warning(f"UCP Integration chart failed: {e}")
+        # Fallback with generic structure
+        return self._get_fallback_chart_data(input_data)
 
-        # Chart 3: Data Quality ROI Timeline
-        try:
-            asset = self._generate_data_quality_roi_chart()
-            if asset:
-                assets.append(asset)
-        except Exception as e:
-            self.logger.warning(f"Data Quality ROI chart failed: {e}")
+    def _get_fallback_chart_data(self, input_data: VisualAssetInput) -> dict:
+        """Fallback chart data when LLM extraction fails."""
+        topic_words = input_data.topic.split()[:3]
+        topic_short = " ".join(topic_words)
 
-        # Chart 4: TUI Data Assets Comparison
-        try:
-            asset = self._generate_tui_data_assets_chart()
-            if asset:
-                assets.append(asset)
-        except Exception as e:
-            self.logger.warning(f"TUI Data Assets chart failed: {e}")
+        return {
+            "topic_short": topic_short,
+            "company": "TUI",
+            "dimensions": {
+                "title": f"{topic_short} Framework",
+                "items": [
+                    {"name": "Strategic Alignment", "score": 65},
+                    {"name": "Technology Readiness", "score": 55},
+                    {"name": "Organizational Capability", "score": 60},
+                    {"name": "Data Infrastructure", "score": 50},
+                    {"name": "Process Maturity", "score": 70},
+                ]
+            },
+            "transformation": {
+                "title": f"{topic_short} Transformation",
+                "before_label": "Current State",
+                "after_label": "Target State",
+                "categories": ["Operations", "Technology", "Customer Experience", "Data", "Integration"],
+                "before_values": [65, 55, 60, 50, 45],
+                "after_values": [90, 88, 92, 85, 90]
+            },
+            "timeline": {
+                "title": "Implementation ROI",
+                "breakeven_month": 15,
+                "total_months": 36,
+                "roi_percentage": 250
+            },
+            "competitive": {
+                "title": "Competitive Position",
+                "protagonist": "TUI",
+                "competitor": "Industry Average",
+                "categories": ["Capability 1", "Capability 2", "Capability 3", "Capability 4", "Capability 5"],
+                "protagonist_scores": [85, 80, 75, 70, 85],
+                "competitor_scores": [50, 55, 45, 60, 40],
+                "moat_label": "Competitive Advantage"
+            },
+            "roadmap": {
+                "title": "Implementation Roadmap",
+                "phases": [
+                    {"name": "Phase 1: Foundation", "duration": 6, "items": ["Assessment", "Planning", "Quick Wins"]},
+                    {"name": "Phase 2: Build", "duration": 12, "items": ["Core Implementation", "Integration", "Testing"]},
+                    {"name": "Phase 3: Scale", "duration": 18, "items": ["Full Rollout", "Optimization", "Expansion"]}
+                ],
+                "milestones": [
+                    {"month": 6, "label": "Foundation Complete"},
+                    {"month": 18, "label": "Core Live"},
+                    {"month": 36, "label": "Full Scale"}
+                ]
+            }
+        }
 
-        # Chart 5: Implementation Roadmap
-        try:
-            asset = self._generate_implementation_roadmap_chart()
-            if asset:
-                assets.append(asset)
-        except Exception as e:
-            self.logger.warning(f"Implementation Roadmap chart failed: {e}")
+    async def _generate_framework_chart(self, input_data: VisualAssetInput, chart_data: dict, index: int) -> Optional[GeneratedAsset]:
+        """Generate framework/dimensions chart dynamically based on article content."""
+        dims = chart_data.get("dimensions", {})
+        topic_short = chart_data.get("topic_short", "Strategic")
+        company = chart_data.get("company", "TUI")
 
-        return assets
+        items = dims.get("items", [])
+        if not items:
+            items = [{"name": f"Dimension {i+1}", "score": 50 + i*5} for i in range(6)]
 
-    def _generate_12_dimensions_chart(self) -> Optional[GeneratedAsset]:
-        """Generate the 12 Dimensions of UCP framework overview."""
-        filename = "chart_1_ucp_12_dimensions_framework.png"
+        labels = [f"{i+1}. {item['name']}" for i, item in enumerate(items)]
+        values = [item.get("score", 50) for item in items]
+
+        # Find highest score for highlight
+        max_idx = values.index(max(values))
+        highlight_label = labels[max_idx]
+
+        safe_topic = topic_short.lower().replace(' ', '_')[:20]
+        filename = f"chart_1_{safe_topic}_framework.png"
         file_path = self.shared_state.visuals_dir / filename
 
-        # Create a horizontal bar chart showing the 12 dimensions with readiness scores
         result_path = self.tools["generate_chart"](
             chart_type="horizontal_bar",
             data={
-                "labels": [
-                    "1. Data Architecture",
-                    "2. API Standardization",
-                    "3. Real-Time Inventory",
-                    "4. Customer Identity",
-                    "5. Dynamic Pricing",
-                    "6. Predictive Analytics",
-                    "7. Omnichannel Experience",
-                    "8. Operational Efficiency",
-                    "9. Compliance & Governance",
-                    "10. Supplier Ecosystem",
-                    "11. Performance Metrics",
-                    "12. Strategic Scalability"
-                ],
-                "values": [65, 45, 55, 40, 70, 35, 50, 60, 75, 45, 55, 40],
-                "xlabel": "TUI Readiness Score (%)",
+                "labels": labels,
+                "values": values,
+                "xlabel": f"{company} Readiness Score (%)",
             },
-            title="UCP Framework: 12 Dimensions of Transformation",
-            subtitle="Current TUI readiness assessment across all UCP dimensions",
+            title=dims.get("title", f"{topic_short} Framework"),
+            subtitle=f"Current {company} readiness assessment across key dimensions",
             output_path=file_path,
-            highlight="5. Dynamic Pricing",  # Highlight strongest dimension
+            highlight=highlight_label,
         )
 
         if result_path and result_path.exists():
@@ -323,53 +415,57 @@ class VisualAssetAgent(LLMAgent[VisualAssetInput, VisualAssetOutput]):
             return GeneratedAsset(
                 filename=filename,
                 type="chart",
-                title="UCP 12 Dimensions Framework",
-                description="Strategic overview of TUI's readiness across all 12 UCP dimensions",
+                title=dims.get("title", f"{topic_short} Framework"),
+                description=f"Strategic overview of {company}'s readiness across all dimensions",
                 file_path=result_path,
-                generation_method="curated:ucp_framework",
+                generation_method="adaptive:framework_chart",
                 quality_score=quality,
             )
         return None
 
-    def _generate_ucp_integration_chart(self) -> Optional[GeneratedAsset]:
-        """Generate Before/After UCP system integration comparison."""
-        filename = "chart_2_system_integration_before_after.png"
+    async def _generate_transformation_chart(self, input_data: VisualAssetInput, chart_data: dict, index: int) -> Optional[GeneratedAsset]:
+        """Generate Before/After transformation comparison dynamically."""
+        trans = chart_data.get("transformation", {})
+        topic_short = chart_data.get("topic_short", "Strategic")
+        company = chart_data.get("company", "TUI")
+
+        safe_topic = topic_short.lower().replace(' ', '_')[:20]
+        filename = f"chart_2_{safe_topic}_transformation.png"
         file_path = self.shared_state.visuals_dir / filename
 
-        # Use chart skill with grouped bar comparison
+        # Get dynamic data
+        categories = trans.get("categories", ["Operations", "Technology", "Customer", "Data", "Integration"])
+        before_values = trans.get("before_values", [65, 55, 60, 50, 45])
+        after_values = trans.get("after_values", [90, 88, 92, 85, 90])
+        before_label = trans.get("before_label", "Current State")
+        after_label = trans.get("after_label", "Target State")
+        title = trans.get("title", f"{topic_short} Transformation")
+
         import matplotlib
         matplotlib.use('Agg')
         import matplotlib.pyplot as plt
-        import numpy as np
 
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 7))
 
-        # Before UCP - Fragmented
-        systems = ['Airlines\n(GDS)', 'Hotels\n(PMS)', 'Cruises\n(CRS)', 'Experiences\n(TUI Musement)', 'Customer\nService']
-        fragmentation = [85, 78, 82, 70, 65]
-        colors_before = ['#E57373'] * 5
-
-        ax1.barh(systems, fragmentation, color=colors_before, edgecolor='white', linewidth=2)
-        ax1.set_xlabel('Data Fragmentation Index', fontsize=12, fontweight='bold')
-        ax1.set_title('BEFORE UCP\nFragmented Systems', fontsize=14, fontweight='bold', color='#D32F2F')
+        # Before - Current State
+        colors_before = ['#E57373'] * len(categories)
+        ax1.barh(categories, before_values, color=colors_before, edgecolor='white', linewidth=2)
+        ax1.set_xlabel('Current Score', fontsize=12, fontweight='bold')
+        ax1.set_title(f'BEFORE\n{before_label}', fontsize=14, fontweight='bold', color='#D32F2F')
         ax1.set_xlim(0, 100)
-        for i, v in enumerate(fragmentation):
+        for i, v in enumerate(before_values):
             ax1.text(v + 2, i, f'{v}%', va='center', fontweight='bold', fontsize=11)
-        ax1.axvline(x=50, color='#999', linestyle='--', alpha=0.5, label='Target threshold')
 
-        # After UCP - Unified
-        integration = [95, 92, 90, 88, 94]
-        colors_after = ['#66BB6A'] * 5
-
-        ax2.barh(systems, integration, color=colors_after, edgecolor='white', linewidth=2)
-        ax2.set_xlabel('Data Integration Score', fontsize=12, fontweight='bold')
-        ax2.set_title('AFTER UCP\nUnified Commerce Layer', fontsize=14, fontweight='bold', color='#388E3C')
+        # After - Target State
+        colors_after = ['#66BB6A'] * len(categories)
+        ax2.barh(categories, after_values, color=colors_after, edgecolor='white', linewidth=2)
+        ax2.set_xlabel('Target Score', fontsize=12, fontweight='bold')
+        ax2.set_title(f'AFTER\n{after_label}', fontsize=14, fontweight='bold', color='#388E3C')
         ax2.set_xlim(0, 100)
-        for i, v in enumerate(integration):
+        for i, v in enumerate(after_values):
             ax2.text(v + 2, i, f'{v}%', va='center', fontweight='bold', fontsize=11)
-        ax2.axvline(x=90, color='#388E3C', linestyle='--', alpha=0.5, label='Excellence threshold')
 
-        fig.suptitle('TUI System Integration: The UCP Transformation', fontsize=16, fontweight='bold', y=1.02)
+        fig.suptitle(f'{company}: {title}', fontsize=16, fontweight='bold', y=1.02)
         plt.tight_layout()
         plt.savefig(file_path, dpi=300, bbox_inches='tight', facecolor='white')
         plt.close(fig)
@@ -379,17 +475,27 @@ class VisualAssetAgent(LLMAgent[VisualAssetInput, VisualAssetOutput]):
             return GeneratedAsset(
                 filename=filename,
                 type="chart",
-                title="System Integration Before/After UCP",
-                description="Comparison of TUI's system integration levels before and after UCP implementation",
+                title=f"{title} - Before/After",
+                description=f"Comparison of {company}'s state before and after transformation",
                 file_path=file_path,
-                generation_method="curated:ucp_integration",
+                generation_method="adaptive:transformation_chart",
                 quality_score=quality,
             )
         return None
 
-    def _generate_data_quality_roi_chart(self) -> Optional[GeneratedAsset]:
-        """Generate Data Quality Investment ROI Timeline."""
-        filename = "chart_3_data_quality_roi_timeline.png"
+    async def _generate_roi_timeline_chart(self, input_data: VisualAssetInput, chart_data: dict, index: int) -> Optional[GeneratedAsset]:
+        """Generate ROI Timeline chart dynamically."""
+        timeline = chart_data.get("timeline", {})
+        topic_short = chart_data.get("topic_short", "Strategic")
+        company = chart_data.get("company", "TUI")
+
+        breakeven = timeline.get("breakeven_month", 15)
+        total_months = timeline.get("total_months", 36)
+        roi_pct = timeline.get("roi_percentage", 250)
+        title = timeline.get("title", "Implementation ROI")
+
+        safe_topic = topic_short.lower().replace(' ', '_')[:20]
+        filename = f"chart_3_{safe_topic}_roi_timeline.png"
         file_path = self.shared_state.visuals_dir / filename
 
         import matplotlib
@@ -399,27 +505,26 @@ class VisualAssetAgent(LLMAgent[VisualAssetInput, VisualAssetOutput]):
 
         fig, ax = plt.subplots(figsize=(12, 7))
 
-        # Timeline data
-        months = ['M0', 'M6', 'M12', 'M18', 'M24', 'M30', 'M36']
-        investment = [100, 85, 70, 50, 30, 15, 10]  # Cumulative cost (normalized, declining)
-        returns = [0, 15, 45, 90, 150, 220, 310]  # Cumulative returns
+        # Generate timeline data based on parameters
+        num_points = 7
+        months = [f'M{int(i * total_months / (num_points-1))}' for i in range(num_points)]
+        investment = [100, 85, 70, 50, 30, 15, 10]
+        returns = [0, roi_pct * 0.05, roi_pct * 0.15, roi_pct * 0.3, roi_pct * 0.5, roi_pct * 0.7, roi_pct]
 
         x = np.arange(len(months))
+        breakeven_x = (breakeven / total_months) * (num_points - 1)
 
-        # Plot investment and returns
         ax.fill_between(x, investment, alpha=0.3, color='#E57373', label='Cumulative Investment')
         ax.fill_between(x, returns, alpha=0.3, color='#66BB6A', label='Cumulative Returns')
         ax.plot(x, investment, 'o-', color='#D32F2F', linewidth=2.5, markersize=8, label='Investment Trajectory')
         ax.plot(x, returns, 'o-', color='#388E3C', linewidth=2.5, markersize=8, label='ROI Trajectory')
 
-        # Breakeven point
-        ax.axvline(x=2.5, color='#1976D2', linestyle='--', linewidth=2, alpha=0.8)
-        ax.annotate('BREAKEVEN\nMONTH 15', xy=(2.5, 60), fontsize=11, fontweight='bold',
+        ax.axvline(x=breakeven_x, color='#1976D2', linestyle='--', linewidth=2, alpha=0.8)
+        ax.annotate(f'BREAKEVEN\nMONTH {breakeven}', xy=(breakeven_x, max(returns)*0.3), fontsize=11, fontweight='bold',
                     ha='center', color='#1976D2',
                     bbox=dict(boxstyle='round,pad=0.3', facecolor='#E3F2FD', edgecolor='#1976D2'))
 
-        # ROI annotation
-        ax.annotate('310% ROI\nby Month 36', xy=(6, 310), fontsize=12, fontweight='bold',
+        ax.annotate(f'{roi_pct}% ROI\nby Month {total_months}', xy=(num_points-1, roi_pct), fontsize=12, fontweight='bold',
                     ha='center', color='#388E3C',
                     bbox=dict(boxstyle='round,pad=0.3', facecolor='#E8F5E9', edgecolor='#388E3C'))
 
@@ -427,10 +532,10 @@ class VisualAssetAgent(LLMAgent[VisualAssetInput, VisualAssetOutput]):
         ax.set_xticklabels(months, fontsize=11)
         ax.set_xlabel('Implementation Timeline', fontsize=12, fontweight='bold')
         ax.set_ylabel('Value Index (Base = 100)', fontsize=12, fontweight='bold')
-        ax.set_title('Data Quality Investment: ROI Trajectory', fontsize=16, fontweight='bold', pad=20)
+        ax.set_title(f'{title}: ROI Trajectory', fontsize=16, fontweight='bold', pad=20)
         ax.legend(loc='upper left', fontsize=10)
         ax.grid(axis='y', alpha=0.3, linestyle='--')
-        ax.set_ylim(0, 350)
+        ax.set_ylim(0, roi_pct * 1.15)
 
         plt.tight_layout()
         plt.savefig(file_path, dpi=300, bbox_inches='tight', facecolor='white')
@@ -441,17 +546,30 @@ class VisualAssetAgent(LLMAgent[VisualAssetInput, VisualAssetOutput]):
             return GeneratedAsset(
                 filename=filename,
                 type="timeline",
-                title="Data Quality ROI Timeline",
-                description="Investment trajectory and ROI projections for UCP data quality initiatives",
+                title=f"{title} Timeline",
+                description=f"Investment trajectory and ROI projections for {topic_short}",
                 file_path=file_path,
-                generation_method="curated:data_quality_roi",
+                generation_method="adaptive:roi_timeline",
                 quality_score=quality,
             )
         return None
 
-    def _generate_tui_data_assets_chart(self) -> Optional[GeneratedAsset]:
-        """Generate TUI Data Assets vs OTA comparison."""
-        filename = "chart_4_tui_vs_ota_data_advantage.png"
+    async def _generate_competitive_chart(self, input_data: VisualAssetInput, chart_data: dict, index: int) -> Optional[GeneratedAsset]:
+        """Generate competitive advantage comparison chart dynamically."""
+        comp = chart_data.get("competitive", {})
+        topic_short = chart_data.get("topic_short", "Strategic")
+        company = chart_data.get("company", "TUI")
+
+        protagonist = comp.get("protagonist", company)
+        competitor = comp.get("competitor", "Competitors")
+        categories = comp.get("categories", ["Cap 1", "Cap 2", "Cap 3", "Cap 4", "Cap 5"])
+        prot_scores = comp.get("protagonist_scores", [85, 80, 75, 70, 85])
+        comp_scores = comp.get("competitor_scores", [50, 55, 45, 60, 40])
+        moat_label = comp.get("moat_label", "Competitive Advantage")
+        title = comp.get("title", "Competitive Position")
+
+        safe_topic = topic_short.lower().replace(' ', '_')[:20]
+        filename = f"chart_4_{safe_topic}_competitive.png"
         file_path = self.shared_state.visuals_dir / filename
 
         import matplotlib
@@ -461,44 +579,42 @@ class VisualAssetAgent(LLMAgent[VisualAssetInput, VisualAssetOutput]):
 
         fig, ax = plt.subplots(figsize=(12, 7))
 
-        categories = ['Proprietary\nOperational Data', 'End-to-End\nCustomer Journey', 'Real-Time\nInventory Control',
-                      'Behavioral\nInsights', 'Cross-Asset\nOptimization']
-
-        tui_scores = [95, 85, 90, 80, 88]
-        ota_scores = [25, 35, 20, 45, 15]
+        # Format categories for display (add line breaks if needed)
+        display_cats = [cat.replace(' ', '\n') if len(cat) > 15 else cat for cat in categories]
 
         x = np.arange(len(categories))
         width = 0.35
 
-        bars1 = ax.bar(x - width/2, tui_scores, width, label='TUI (Vertically Integrated)',
+        bars1 = ax.bar(x - width/2, prot_scores, width, label=protagonist,
                        color='#1976D2', edgecolor='white', linewidth=2)
-        bars2 = ax.bar(x + width/2, ota_scores, width, label='OTAs (Asset-Light)',
+        bars2 = ax.bar(x + width/2, comp_scores, width, label=competitor,
                        color='#FF7043', edgecolor='white', linewidth=2)
 
-        # Add value labels
         for bar in bars1:
             height = bar.get_height()
-            ax.annotate(f'{height}%', xy=(bar.get_x() + bar.get_width()/2, height),
+            ax.annotate(f'{int(height)}%', xy=(bar.get_x() + bar.get_width()/2, height),
                         xytext=(0, 3), textcoords="offset points", ha='center', va='bottom',
                         fontweight='bold', fontsize=10, color='#1976D2')
         for bar in bars2:
             height = bar.get_height()
-            ax.annotate(f'{height}%', xy=(bar.get_x() + bar.get_width()/2, height),
+            ax.annotate(f'{int(height)}%', xy=(bar.get_x() + bar.get_width()/2, height),
                         xytext=(0, 3), textcoords="offset points", ha='center', va='bottom',
                         fontweight='bold', fontsize=10, color='#FF7043')
 
-        # Add "DATA MOAT" annotation
-        ax.annotate('DATA MOAT\nAdvantage', xy=(0, 95), xytext=(0, 105),
+        # Add moat annotation at highest point
+        max_score = max(prot_scores)
+        max_idx = prot_scores.index(max_score)
+        ax.annotate(f'{moat_label}', xy=(max_idx - width/2, max_score), xytext=(max_idx - width/2, max_score + 10),
                     fontsize=11, fontweight='bold', ha='center', color='#1565C0',
                     arrowprops=dict(arrowstyle='->', color='#1565C0', lw=2),
                     bbox=dict(boxstyle='round,pad=0.3', facecolor='#E3F2FD', edgecolor='#1565C0'))
 
-        ax.set_ylabel('Data Access & Quality Score (%)', fontsize=12, fontweight='bold')
-        ax.set_title('TUI\'s Competitive Data Advantage Through UCP', fontsize=16, fontweight='bold', pad=20)
+        ax.set_ylabel('Capability Score (%)', fontsize=12, fontweight='bold')
+        ax.set_title(f'{protagonist}\'s {title}', fontsize=16, fontweight='bold', pad=20)
         ax.set_xticks(x)
-        ax.set_xticklabels(categories, fontsize=10)
+        ax.set_xticklabels(display_cats, fontsize=10)
         ax.legend(loc='upper right', fontsize=11)
-        ax.set_ylim(0, 120)
+        ax.set_ylim(0, max(max(prot_scores), max(comp_scores)) * 1.3)
         ax.grid(axis='y', alpha=0.3, linestyle='--')
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
@@ -512,66 +628,77 @@ class VisualAssetAgent(LLMAgent[VisualAssetInput, VisualAssetOutput]):
             return GeneratedAsset(
                 filename=filename,
                 type="chart",
-                title="TUI vs OTA Data Advantage",
-                description="Comparison of TUI's data capabilities vs asset-light OTAs through UCP lens",
+                title=f"{protagonist} vs {competitor}",
+                description=f"Comparison of {protagonist}'s capabilities vs {competitor}",
                 file_path=file_path,
-                generation_method="curated:tui_data_advantage",
+                generation_method="adaptive:competitive_chart",
                 quality_score=quality,
             )
         return None
 
-    def _generate_implementation_roadmap_chart(self) -> Optional[GeneratedAsset]:
-        """Generate UCP Implementation Roadmap."""
-        filename = "chart_5_ucp_implementation_roadmap.png"
+    async def _generate_roadmap_chart(self, input_data: VisualAssetInput, chart_data: dict, index: int) -> Optional[GeneratedAsset]:
+        """Generate implementation roadmap chart dynamically."""
+        roadmap = chart_data.get("roadmap", {})
+        topic_short = chart_data.get("topic_short", "Strategic")
+        company = chart_data.get("company", "TUI")
+
+        phases = roadmap.get("phases", [
+            {"name": "Phase 1: Foundation", "duration": 6, "items": ["Assessment", "Planning", "Quick Wins"]},
+            {"name": "Phase 2: Build", "duration": 12, "items": ["Implementation", "Integration", "Testing"]},
+            {"name": "Phase 3: Scale", "duration": 18, "items": ["Rollout", "Optimization", "Expansion"]}
+        ])
+        milestones = roadmap.get("milestones", [
+            {"month": 6, "label": "Foundation"},
+            {"month": 18, "label": "Core Live"},
+            {"month": 36, "label": "Complete"}
+        ])
+        title = roadmap.get("title", "Implementation Roadmap")
+
+        safe_topic = topic_short.lower().replace(' ', '_')[:20]
+        filename = f"chart_5_{safe_topic}_roadmap.png"
         file_path = self.shared_state.visuals_dir / filename
 
         import matplotlib
         matplotlib.use('Agg')
         import matplotlib.pyplot as plt
-        import matplotlib.patches as mpatches
-        import numpy as np
 
         fig, ax = plt.subplots(figsize=(14, 8))
 
-        # Roadmap phases
-        phases = [
-            {'name': 'Phase 1: Foundation\n(0-6 months)', 'start': 0, 'duration': 6, 'color': '#1976D2',
-             'items': ['UCP adapters for high-volume', 'Customer identity pilot', 'Governance committee']},
-            {'name': 'Phase 2: Expansion\n(6-18 months)', 'start': 6, 'duration': 12, 'color': '#388E3C',
-             'items': ['400+ hotels integration', '130+ aircraft unified', 'AI/ML pipeline connection']},
-            {'name': 'Phase 3: Transformation\n(18-36 months)', 'start': 18, 'duration': 18, 'color': '#F57C00',
-             'items': ['Real-time dynamic packaging', 'Conversational AI layer', 'Full ecosystem integration']},
-        ]
+        colors = ['#1976D2', '#388E3C', '#F57C00']
+        y_positions = list(range(len(phases), 0, -1))
+        start = 0
 
-        y_positions = [3, 2, 1]
+        for i, (phase, y_pos) in enumerate(zip(phases, y_positions)):
+            duration = phase.get("duration", 6)
+            phase_name = phase.get("name", f"Phase {i+1}")
+            items = phase.get("items", [])
 
-        for phase, y_pos in zip(phases, y_positions):
-            # Draw phase bar
-            bar = ax.barh(y_pos, phase['duration'], left=phase['start'], height=0.6,
-                          color=phase['color'], alpha=0.8, edgecolor='white', linewidth=2)
+            color = colors[i % len(colors)]
+            ax.barh(y_pos, duration, left=start, height=0.6,
+                    color=color, alpha=0.8, edgecolor='white', linewidth=2)
 
-            # Phase name label
-            ax.text(phase['start'] + phase['duration']/2, y_pos, phase['name'],
-                    ha='center', va='center', fontsize=11, fontweight='bold', color='white')
+            ax.text(start + duration/2, y_pos, f'{phase_name}\n({start}-{start+duration} months)',
+                    ha='center', va='center', fontsize=10, fontweight='bold', color='white')
 
-            # Items below each phase
-            for i, item in enumerate(phase['items']):
-                ax.text(phase['start'] + 0.5, y_pos - 0.4 - (i * 0.15), f'• {item}',
-                        fontsize=9, color='#333', va='top')
+            for j, item in enumerate(items[:3]):
+                ax.text(start + 0.5, y_pos - 0.35 - (j * 0.12), f'• {item}',
+                        fontsize=8, color='#333', va='top')
 
-        # Add milestones
-        milestones = [(6, 'Pilot Complete'), (18, 'Core Live'), (36, 'Full UCP')]
-        for x, label in milestones:
-            ax.axvline(x=x, color='#D32F2F', linestyle='--', linewidth=2, alpha=0.7)
-            ax.annotate(label, xy=(x, 3.6), fontsize=10, fontweight='bold', ha='center',
+            start += duration
+
+        for ms in milestones:
+            month = ms.get("month", 6)
+            label = ms.get("label", "Milestone")
+            ax.axvline(x=month, color='#D32F2F', linestyle='--', linewidth=2, alpha=0.7)
+            ax.annotate(label, xy=(month, max(y_positions) + 0.5), fontsize=9, fontweight='bold', ha='center',
                         color='#D32F2F', bbox=dict(boxstyle='round,pad=0.2', facecolor='#FFEBEE', edgecolor='#D32F2F'))
 
-        ax.set_xlim(-1, 40)
-        ax.set_ylim(0, 4.2)
+        total_duration = sum(p.get("duration", 6) for p in phases)
+        ax.set_xlim(-1, total_duration + 5)
+        ax.set_ylim(0, max(y_positions) + 1)
         ax.set_xlabel('Months from Start', fontsize=12, fontweight='bold')
         ax.set_yticks([])
-        ax.set_title('UCP Implementation Roadmap: Quick Wins to Full Transformation',
-                     fontsize=16, fontweight='bold', pad=20)
+        ax.set_title(f'{title}: {topic_short}', fontsize=16, fontweight='bold', pad=20)
         ax.grid(axis='x', alpha=0.3, linestyle='--')
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
@@ -586,10 +713,10 @@ class VisualAssetAgent(LLMAgent[VisualAssetInput, VisualAssetOutput]):
             return GeneratedAsset(
                 filename=filename,
                 type="timeline",
-                title="UCP Implementation Roadmap",
-                description="Phased approach from foundation to full UCP transformation",
+                title=title,
+                description=f"Phased implementation approach for {topic_short}",
                 file_path=file_path,
-                generation_method="curated:implementation_roadmap",
+                generation_method="adaptive:roadmap_chart",
                 quality_score=quality,
             )
         return None
