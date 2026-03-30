@@ -11,7 +11,7 @@ import subprocess
 from pathlib import Path
 from datetime import datetime
 
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # Set AWS credentials for Bedrock
 os.environ["AWS_PROFILE"] = os.environ.get("AWS_PROFILE", "mll-dev")

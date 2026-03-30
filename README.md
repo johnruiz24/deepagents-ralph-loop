@@ -35,33 +35,31 @@ Transform complex research into beautifully illustrated, HBR-quality strategic n
 ### 9-Agent Orchestration
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        ORCHESTRATOR                              │
-│         Central coordinator managing workflow phases             │
-└─────────────────────────────────────────────────────────────────┘
-                                │
-        ┌───────────────────────┼───────────────────────┐
-        ▼                       ▼                       ▼
-┌───────────────┐    ┌───────────────┐    ┌───────────────┐
-│   RESEARCH    │    │   CONTENT     │    │  PRODUCTION   │
-│    PHASE      │    │    PHASE      │    │    PHASE      │
-├───────────────┤    ├───────────────┤    ├───────────────┤
-│ 1. Query      │    │ 4. Synthesis  │    │ 6. Visual     │
-│    Formulation│    │    & Narrative│    │    Assets     │
-│ 2. Parallelized│   │ 5. HBR Style  │    │ 7. Multimedia │
-│    Research   │    │    Editor     │    │ 8. Assembly   │
-│ 3. Strategic  │    │               │    │               │
-│    Analysis   │    │               │    │               │
-└───────────────┘    └───────────────┘    └───────────────┘
-                                │
-                                ▼
-                    ┌───────────────────┐
-                    │     SKILLS        │
-                    │  (Reusable Tools) │
-                    │ • visual_generation│
-                    │ • audio_generation │
-                    │ • pdf_generation   │
-                    └───────────────────┘
+                        ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+                        ┃      ORCHESTRATOR                ┃
+                        ┃  Central workflow coordinator    ┃
+                        ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+                                      │
+                ┌─────────────────────┼─────────────────────┐
+                ▼                     ▼                     ▼
+        ┏━━━━━━━━━━━━━━┓    ┏━━━━━━━━━━━━━━┓    ┏━━━━━━━━━━━━━━┓
+        ┃   RESEARCH   ┃    ┃   CONTENT    ┃    ┃ PRODUCTION   ┃
+        ┃    PHASE     ┃    ┃    PHASE     ┃    ┃   PHASE      ┃
+        ├──────────────┤    ├──────────────┤    ├──────────────┤
+        ┃ 1. Query     ┃    ┃ 4. Synthesis ┃    ┃ 6. Visual    ┃
+        ┃    Form.     ┃    ┃ 5. HBR Style ┃    ┃    Assets    ┃
+        ┃ 2. Research  ┃    ┃    Editor    ┃    ┃ 7. Multimedia┃
+        ┃ 3. Strategy  ┃    ┃              ┃    ┃ 8. Assembly  ┃
+        ┗━━━━━━━━━━━━━━┛    ┗━━━━━━━━━━━━━━┛    ┗━━━━━━━━━━━━━━┛
+                                      │
+                                      ▼
+                    ┏━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+                    ┃      SKILLS              ┃
+                    ┃   (Reusable Tools)       ┃
+                    ┃ • visual_generation      ┃
+                    ┃ • audio_generation       ┃
+                    ┃ • pdf_generation         ┃
+                    ┗━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 ```
 
 **Agent Details:**
@@ -89,29 +87,29 @@ Transform complex research into beautifully illustrated, HBR-quality strategic n
 Raw Research Data
       │
       ▼
-┌─────────────────────────────────────────────────────────────┐
-│ PHASE 1: RESEARCH                                           │
-│ ├─ Query Formulation (plan what to research)              │
-│ ├─ Parallelized Research (query HBR, MIT, Skift, etc.)    │
-│ └─ Strategic Analysis (business context grounding)        │
-└─────────────────────────────────────────────────────────────┘
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  PHASE 1: RESEARCH
+  ├─ Query Formulation (plan what to research)
+  ├─ Parallelized Research (query HBR, MIT, Skift, etc.)
+  └─ Strategic Analysis (business context grounding)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
       │
       ▼
-┌─────────────────────────────────────────────────────────────┐
-│ PHASE 2: CONTENT CREATION                                   │
-│ ├─ Synthesis (extract key insights)                        │
-│ ├─ HBR Style Editor (professional tone & structure)        │
-│ └─ Quality Validation (readability, depth, tone)           │
-└─────────────────────────────────────────────────────────────┘
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  PHASE 2: CONTENT CREATION
+  ├─ Synthesis (extract key insights)
+  ├─ HBR Style Editor (professional tone & structure)
+  └─ Quality Validation (readability, depth, tone)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
       │
       ▼
-┌─────────────────────────────────────────────────────────────┐
-│ PHASE 3: PRODUCTION                                         │
-│ ├─ Visual Assets (charts, diagrams, timelines)             │
-│ ├─ Multimedia (audio narration)                            │
-│ ├─ Assembly (PDF/HTML compilation)                         │
-│ └─ Final Validation (deliverable quality check)            │
-└─────────────────────────────────────────────────────────────┘
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  PHASE 3: PRODUCTION
+  ├─ Visual Assets (charts, diagrams, timelines)
+  ├─ Multimedia (audio narration)
+  ├─ Assembly (PDF/HTML compilation)
+  └─ Final Validation (deliverable quality check)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
       │
       ▼
 HBR-Quality Deliverables (PDF, HTML, MP3, ZIP)
@@ -193,10 +191,13 @@ cp .env.example .env
 
 ```bash
 # End-to-end newsletter generation
-PYTHONPATH=. python run_e2e_test.py
+PYTHONPATH=. python scripts/run_e2e_test.py
 
-# Or run with custom topic
-PYTHONPATH=. python run_cli.py
+# Interactive CLI with custom topic
+PYTHONPATH=. python scripts/run_cli.py
+
+# Ralph Mode (advanced orchestration)
+PYTHONPATH=. python scripts/ralph_mode.py
 ```
 
 ### Example Output Structure
@@ -253,25 +254,25 @@ output/
 
 ```
 ralph-deep-agents-loop/
-├── src/
-│   ├── agents/              # 8 specialized agent implementations
-│   │   ├── base_agent.py
-│   │   ├── research_agent.py
-│   │   ├── synthesis_agent.py
-│   │   ├── hbr_editor_agent.py
-│   │   ├── visual_asset_agent.py
-│   │   ├── multimedia_agent.py
-│   │   ├── assembly_agent.py
-│   │   └── query_formulation_agent.py
+├── src/                     # Core implementation
+│   ├── agents/              # 9 specialized agent implementations
 │   ├── orchestrator/        # Central workflow coordinator
 │   ├── state/               # Shared state management
 │   ├── quality_gates/       # Validation at each phase
 │   ├── tools/               # Web search, PDF generation
+│   ├── image_generation/    # Visual asset creation
 │   └── utils/               # Logging, AWS config
 ├── skills/                  # Reusable skill modules
-│   └── visual_generation/
+│   └── visual_generation/   # Charts, diagrams, timelines
+├── scripts/                 # Runner and utility scripts
+│   ├── run_cli.py          # Interactive CLI runner
+│   ├── run_e2e_test.py     # End-to-end test
+│   ├── ralph_mode.py       # Advanced orchestration
+│   └── run_*.py            # Other runners
 ├── tests/                   # Comprehensive test suite
 ├── docs/                    # Architecture documentation
+├── assets/                  # Hero images for README
+├── diagrams/                # Architecture diagrams
 └── output/                  # Generated newsletters (gitignored)
 ```
 

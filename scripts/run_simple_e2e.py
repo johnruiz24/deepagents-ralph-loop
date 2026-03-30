@@ -12,7 +12,7 @@ from pathlib import Path
 from datetime import datetime
 
 # Add src to path
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # ANSI colors
 class C:
