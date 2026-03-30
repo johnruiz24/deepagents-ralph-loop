@@ -1,0 +1,32 @@
+{
+  "title": "Universal Commerce Protocol (UCP): TUI's Architecture for Autonomous Travel Commerce",
+  "subtitle": "How a unified commerce protocol can transform TUI from integrated tour operator to AI-native travel platform before the strategic window closes",
+  "topic": "Universal Commerce Protocol (UCP)",
+  "word_count": 3211,
+  "created": "2026-03-30T00:25:26.981387",
+  "deliverables": {
+    "pdf": {
+      "generated": true,
+      "filename": "newsletter_universal_commerce_protocol_ucp_tuis_architecture_for_autonomous_travel_commerce.pdf",
+      "pages": 6
+    },
+    "html": {
+      "generated": true,
+      "filename": "newsletter_universal_commerce_protocol_ucp_tuis_architecture_for_autonomous_travel_commerce.html",
+      "responsive": true,
+      "has_audio": true,
+      "has_video": false
+    },
+    "package": {
+      "created": true,
+      "filename": "newsletter_universal_commerce_protocol_ucp_tuis_architecture_for_autonomous_travel_commerce_20260330.zip",
+      "files": 10,
+      "size_mb": 3.58
+    }
+  },
+  "visual_assets": 5,
+  "multimedia": {
+    "audio": "narration_universal_commerce_protocol_ucp_tuis_architecture_for_autonomous_travel_commerce.mp3",
+    "video": null
+  }
+}
