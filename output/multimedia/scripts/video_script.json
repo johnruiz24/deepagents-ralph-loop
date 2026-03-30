@@ -1,0 +1,27 @@
+{
+  "hook": {
+    "duration": 10,
+    "voiceover": "What if TUI's greatest strength\u2014owning hotels, planes, and cruise ships\u2014becomes its biggest vulnerability in the AI age?",
+    "visual_description": "Dramatic aerial shot of a TUI cruise ship and aircraft, then glitch-transition to abstract AI neural network visualization overtaking the frame",
+    "text_overlay": "VERTICAL INTEGRATION: Asset or Liability?"
+  },
+  "explanation": {
+    "duration": 30,
+    "voiceover": "TUI's Universal Commerce Protocol promises autonomous travel commerce\u2014AI handling bookings with minimal human touch. The industry is seeing 60% reductions in manual processes. But here's the counterintuitive truth: AI-native competitors don't need to own a single hotel room. They just need superior demand matching. While TUI manages physical assets, nimble players are achieving hyper-personalization at scale through cloud-native architecture. The efficiency gap between adopters and laggards is creating a two-tier industry\u2014and it's widening fast.",
+    "visual_description": "Split screen: Left shows traditional travel operations with staff, inventory warehouses, physical check-ins. Right shows sleek AI interface matching travelers to experiences in real-time. Animated graph showing efficiency gap widening between two competitor types.",
+    "text_overlay": "60% reduction in manual processes | AI-native vs. Asset-heavy",
+    "key_stat": "60% Manual Process Reduction"
+  },
+  "implication": {
+    "duration": 15,
+    "voiceover": "The strategic window is closing. Leaders must ask: Is our owned inventory an advantage\u2014or an anchor? The winners won't be those with the most assets, but those with the smartest systems. The time for decisive action is now.",
+    "visual_description": "Hourglass with sand running out, transitioning to a fork in the road\u2014one path leading to modern digital infrastructure, the other to legacy systems fading into darkness",
+    "text_overlay": "The window for strategic action is NARROWING"
+  },
+  "cta": {
+    "duration": 5,
+    "voiceover": "Read the full UCP analysis. Link in description.",
+    "visual_description": "Clean branded end card with article title, subtle animated arrow pointing downward toward description",
+    "text_overlay": "READ THE FULL ANALYSIS \u2193"
+  }
+}

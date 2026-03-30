@@ -43,7 +43,6 @@ env/
 Thumbs.db
 
 # Output directories (generated content)
-output/
 outputs/
 final_deliverables/
 

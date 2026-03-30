@@ -1,0 +1,41 @@
+{
+  "total_assets": 5,
+  "assets": [
+    {
+      "filename": "chart_1_universal_commerce_p_framework.png",
+      "type": "chart",
+      "title": "UCP Implementation Framework",
+      "path": "output/20260330_001325_Universal Commerce Protocol _UCP_/visuals/chart_1_universal_commerce_p_framework.png",
+      "quality_score": 100
+    },
+    {
+      "filename": "chart_2_universal_commerce_p_transformation.png",
+      "type": "chart",
+      "title": "TUI's Transformation from Integrated Operator to AI-Native Platform - Before/After",
+      "path": "output/20260330_001325_Universal Commerce Protocol _UCP_/visuals/chart_2_universal_commerce_p_transformation.png",
+      "quality_score": 100
+    },
+    {
+      "filename": "chart_3_universal_commerce_p_roi_timeline.png",
+      "type": "timeline",
+      "title": "UCP Implementation & ROI Timeline Timeline",
+      "path": "output/20260330_001325_Universal Commerce Protocol _UCP_/visuals/chart_3_universal_commerce_p_roi_timeline.png",
+      "quality_score": 100
+    },
+    {
+      "filename": "chart_4_universal_commerce_p_competitive.png",
+      "type": "chart",
+      "title": "TUI with UCP vs AI-Native Competitors",
+      "path": "output/20260330_001325_Universal Commerce Protocol _UCP_/visuals/chart_4_universal_commerce_p_competitive.png",
+      "quality_score": 100
+    },
+    {
+      "filename": "chart_5_universal_commerce_p_roadmap.png",
+      "type": "timeline",
+      "title": "UCP Implementation Roadmap",
+      "path": "output/20260330_001325_Universal Commerce Protocol _UCP_/visuals/chart_5_universal_commerce_p_roadmap.png",
+      "quality_score": 100
+    }
+  ],
+  "failed": []
+}

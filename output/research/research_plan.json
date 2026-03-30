@@ -1,0 +1,74 @@
+{
+  "main_topic": "Universal Commerce Protocol (UCP)",
+  "target_audience": "TUI Leadership and Strategy Teams",
+  "tui_source": "https://www.tuigroup.com/en/investors",
+  "total_sources": 9,
+  "generated_at": "2026-03-30T00:13:37.022271",
+  "research_plan": [
+    {
+      "sub_topic": "Technical architecture of UCP",
+      "queries": [
+        "Universal Commerce Protocol UCP technical architecture specification 2025",
+        "site:phocuswire.com Universal Commerce Protocol agentic AI travel",
+        "Model Context Protocol MCP commerce integration travel booking 2025",
+        "site:technologyreview.com agentic AI protocol standards commerce",
+        "UCP API design pattern machine-readable travel inventory 2025"
+      ],
+      "sources": [
+        "Phocuswire",
+        "MIT Technology Review",
+        "Google AI Blog",
+        "Microsoft Research"
+      ],
+      "focus_areas": [
+        "Protocol specification and API design patterns",
+        "Agentic AI integration and Model Context Protocol relationship",
+        "Machine-readable commerce data structures and interoperability standards"
+      ]
+    },
+    {
+      "sub_topic": "Business implications for online travel agencies",
+      "queries": [
+        "site:skift.com Universal Commerce Protocol OTA disruption 2025",
+        "agentic AI travel booking disintermediation online travel agencies 2025",
+        "site:phocuswire.com UCP impact OTA business model",
+        "AI agents direct supplier booking bypass OTA 2025 2026",
+        "site:deloitte.com agentic commerce travel industry transformation"
+      ],
+      "sources": [
+        "Skift",
+        "Phocuswire",
+        "Deloitte Insights",
+        "Accenture Research",
+        "TUI Group Investor Relations"
+      ],
+      "focus_areas": [
+        "OTA disintermediation risk and revenue model disruption",
+        "Direct supplier-to-consumer AI agent transactions",
+        "Strategic positioning opportunities for integrated travel companies"
+      ]
+    },
+    {
+      "sub_topic": "Competitive landscape and adoption trends",
+      "queries": [
+        "site:skift.com agentic AI travel adoption Booking Expedia 2025",
+        "Universal Commerce Protocol early adopters travel suppliers 2025",
+        "site:phocuswire.com UCP competitive landscape travel tech",
+        "site:accenture.com agentic commerce adoption enterprise 2025 2026",
+        "Google AI travel agent UCP protocol integration 2025"
+      ],
+      "sources": [
+        "Skift",
+        "Phocuswire",
+        "Accenture Research",
+        "Booking.com Corporate",
+        "Google AI Blog"
+      ],
+      "focus_areas": [
+        "Major travel player adoption timelines and strategies",
+        "Big tech AI agent commerce capabilities and travel focus",
+        "Industry consortium and standardization body developments"
+      ]
+    }
+  ]
+}
