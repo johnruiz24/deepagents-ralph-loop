@@ -4,26 +4,35 @@
 
 Transform complex research into beautifully illustrated, HBR-quality strategic narratives with deep-agent coordination, dynamic visualization, and professional-grade publishing.
 
-![9-Agent](https://img.shields.io/badge/Agents-9-blue) ![Skills](https://img.shields.io/badge/Skills--as--Tools-✓-green) ![HBR](https://img.shields.io/badge/HBR-A%2B%20Grade-red)
+![Ralph Hero](assets/ralph-hero.png)
+
+[![Python 3.12+](https://img.shields.io/badge/Python-3.12+-blue.svg)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![LangGraph](https://img.shields.io/badge/Orchestration-LangGraph-green.svg)]()
+[![AWS Bedrock](https://img.shields.io/badge/LLM-AWS%20Bedrock-FF9900.svg)]()
 
 ---
 
 ## Overview
 
-Ralph is a sophisticated multi-agent orchestration framework that automates the complete content generation pipeline—from multi-sourced research and strategic analysis to publication-ready PDF/HTML deliverables with custom visualizations and audio narration. Built for enterprise-grade content quality with Harvard Business Review standards.
+**Ralph** is a sophisticated multi-agent orchestration framework that automates the complete content generation pipeline—from multi-sourced research and strategic analysis to publication-ready PDF/HTML deliverables with custom visualizations and audio narration. Built for enterprise-grade content quality with Harvard Business Review standards.
 
-### Key Features
+### What Ralph Does
 
-- **9 Specialized AI Agents** working in orchestrated sequence
-- **Skills as Tools** - Modular, reusable skills that agents invoke
-- **Dynamic Visualization** - Charts generated based on article content (not hardcoded!)
-- **HBR-Quality Output** with professional charts, diagrams, and typography
-- **Multi-Modal Deliverables**: PDF, HTML, MP3 audio narration
-- **Quality Gates** ensuring editorial standards at each phase
+- 🔍 **Multi-Source Research**: Parallel research agents query premium sources (HBR, Skift, MIT Tech Review, etc.)
+- 🧠 **Strategic Analysis**: Deep agents analyze findings through business context
+- ✨ **Content Synthesis**: LLM-powered insight extraction with counterintuitive discovery
+- 🎨 **Dynamic Visualization**: Auto-generated charts, diagrams, and architectural visuals
+- 📄 **Publication Quality**: HBR-grade formatting with professional typography
+- 🎵 **Multi-Modal Output**: PDF, HTML, and MP3 audio narration
 
 ---
 
 ## Architecture
+
+![Ralph Architecture](assets/ralph-architecture.png)
+
+### 9-Agent Orchestration
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -41,7 +50,7 @@ Ralph is a sophisticated multi-agent orchestration framework that automates the 
 │    Formulation│    │    & Narrative│    │    Assets     │
 │ 2. Parallelized│   │ 5. HBR Style  │    │ 7. Multimedia │
 │    Research   │    │    Editor     │    │ 8. Assembly   │
-│ 3. TUI Strategy│   │               │    │               │
+│ 3. Strategic  │    │               │    │               │
 │    Analysis   │    │               │    │               │
 └───────────────┘    └───────────────┘    └───────────────┘
                                 │
@@ -55,13 +64,89 @@ Ralph is a sophisticated multi-agent orchestration framework that automates the 
                     └───────────────────┘
 ```
 
+**Agent Details:**
+
+| Agent | Role | Input | Output |
+|-------|------|-------|--------|
+| Query Formulation | Converts topics into research queries | Topic, subtopics | Research plan |
+| Research (×3 parallel) | Queries premium sources | Research plan | Raw data |
+| Strategic Analysis | Business context analysis | Raw data | Strategic insights |
+| Synthesis | Extracts counterintuitive insights | Raw + strategic data | Structured insights |
+| HBR Editor | Professional content styling | Insights | Publication-ready prose |
+| Visual Assets | Generates charts & diagrams | Content, data | PNG images (300 DPI) |
+| Multimedia | Creates audio narration | Final content | MP3 narration |
+| Assembly | Compiles final deliverables | All outputs | PDF/HTML/ZIP |
+
 ---
 
-## Skills Architecture
+## Pipeline Visualization
 
-Skills are modular, reusable components that agents invoke as tools. This follows the **"Skills as Tools"** pattern.
+![Ralph Pipeline](assets/ralph-pipeline.png)
 
-### Visual Generation Skill
+### Data Flow
+
+```
+Raw Research Data
+      │
+      ▼
+┌─────────────────────────────────────────────────────────────┐
+│ PHASE 1: RESEARCH                                           │
+│ ├─ Query Formulation (plan what to research)              │
+│ ├─ Parallelized Research (query HBR, MIT, Skift, etc.)    │
+│ └─ Strategic Analysis (business context grounding)        │
+└─────────────────────────────────────────────────────────────┘
+      │
+      ▼
+┌─────────────────────────────────────────────────────────────┐
+│ PHASE 2: CONTENT CREATION                                   │
+│ ├─ Synthesis (extract key insights)                        │
+│ ├─ HBR Style Editor (professional tone & structure)        │
+│ └─ Quality Validation (readability, depth, tone)           │
+└─────────────────────────────────────────────────────────────┘
+      │
+      ▼
+┌─────────────────────────────────────────────────────────────┐
+│ PHASE 3: PRODUCTION                                         │
+│ ├─ Visual Assets (charts, diagrams, timelines)             │
+│ ├─ Multimedia (audio narration)                            │
+│ ├─ Assembly (PDF/HTML compilation)                         │
+│ └─ Final Validation (deliverable quality check)            │
+└─────────────────────────────────────────────────────────────┘
+      │
+      ▼
+HBR-Quality Deliverables (PDF, HTML, MP3, ZIP)
+```
+
+---
+
+## Key Features
+
+### 🎯 Research Excellence
+- **Multi-source parallel queries** across premium publications
+- **Intelligent source selection** based on topic relevance
+- **Quality thresholds** enforced at each research gate
+- **Source tracking** for academic rigor
+
+### 📊 Dynamic Visualization
+- **Automatically generated charts** based on article content (not hardcoded!)
+- **5 chart types**: bar, line, area, pie, and custom architectures
+- **300 DPI publication quality** ready for printing
+- **Intelligent data extraction** from text via LLM analysis
+
+### ✍️ Harvard Business Review Standards
+- **Mandatory structural elements**: Idea in Brief, Pull Quotes, Figure Captions
+- **Persuasive narrative tone** calibrated for C-suite readers
+- **Professional typography** and layout templates
+- **HBR CSS styling** for pixel-perfect presentation
+
+### 🎙️ Multi-Modal Outputs
+- **PDF**: Publication-ready with embedded visuals
+- **HTML**: Responsive web version with interactive elements
+- **MP3**: Professional audio narration (ElevenLabs or Amazon Polly)
+- **ZIP**: Complete deliverable package
+
+### ⚙️ Skills Architecture
+Skills are modular, reusable components that agents invoke as tools:
 
 ```
 skills/
@@ -74,108 +159,16 @@ skills/
         └── timelines.py      # plotly
 ```
 
-#### Available Tools
-
-| Tool | Description | Output |
-|------|-------------|--------|
-| `generate_chart()` | Bar, line, area charts | PNG (300 DPI) |
-| `generate_architecture()` | System/comparison diagrams | PNG (300 DPI) |
-| `generate_timeline()` | Market trajectories | PNG + HTML |
-
-#### Dynamic Generation Flow
-
-```
-Article Content
-      │
-      ▼
-┌─────────────────────────────────┐
-│ LLM: Analyze article            │
-│ → Identify visualization needs  │
-│ → Extract data from text        │
-└─────────────────────────────────┘
-      │
-      ▼
-┌─────────────────────────────────┐
-│ Skills: Generate visuals        │
-│ → Charts with extracted data    │
-│ → Diagrams based on content     │
-└─────────────────────────────────┘
-```
-
-**No hardcoded data!** Different topics produce different visualizations.
-
----
-
-## HBR Article Standards Skill
-
-The `hbr-article-standards` skill ensures all output meets Harvard Business Review publication standards.
-
-```
-skills/
-└── hbr-article-standards/
-    ├── SKILL.md                    # Overview
-    ├── templates/
-    │   ├── hbr_layout_template.html  # Jinja2 HTML template
-    │   └── hbr_pdf_template.css      # Professional styling
-    ├── guidelines/
-    │   ├── structural_elements.md    # 5 mandatory HBR elements
-    │   └── writing_style_guide.md    # Persuasive narrative tone
-    └── examples/                     # Sample outputs
-```
-
-### HBR Structural Elements (Mandatory)
-
-| Element | Description |
-|---------|-------------|
-| **Author Byline** | Name + credentials below title |
-| **Idea in Brief** | Sidebar with Problem/Argument/Solution |
-| **Pull Quotes** | 2-3 impactful sentences displayed prominently |
-| **Figure Captions** | Numbered captions on all visuals |
-| **Provocative Subheadings** | Story-driven section headers |
-
-### Quality Metrics
-
-| Metric | Before | After |
-|--------|--------|-------|
-| HBR Compliance | 6/10 | **9/10** |
-| Structure | 6/10 | **9/10** |
-| Writing Tone | 7/10 | **9/10** |
-| Overall Grade | B (7.5) | **A+ (9.5)** |
-
-### Example Output
-
-```html
-<aside class="idea-in-brief">
-    <h3>Idea in Brief</h3>
-    <div class="iib-section">
-        <h4>THE PROBLEM</h4>
-        <p>TUI's vertically integrated model—owning 130+ aircraft,
-           16 cruise ships, and 400+ hotels—historically provided
-           competitive advantage...</p>
-    </div>
-    <div class="iib-section">
-        <h4>THE ARGUMENT</h4>
-        <p>While asset-light OTAs move faster, they optimize
-           inventory they don't control...</p>
-    </div>
-    <div class="iib-section">
-        <h4>THE SOLUTION</h4>
-        <p>Rather than fighting yesterday's battle, TUI must
-           reframe vertical integration as an AI advantage...</p>
-    </div>
-</aside>
-```
-
 ---
 
 ## Quick Start
 
 ### Prerequisites
 
-- Python 3.12+
-- AWS credentials configured (for Bedrock image/audio generation)
-- Tavily API key (for intelligent web search)
-- Optional: ElevenLabs API key (for premium audio narration)
+- **Python 3.12+** — [Install Python](https://www.python.org/)
+- **AWS Account** — Configured credentials for Bedrock (LLM & image/audio generation)
+- **Tavily API Key** — Get free at [Tavily](https://tavily.com/)
+- **Optional: ElevenLabs API Key** — Premium audio at [ElevenLabs](https://elevenlabs.io/)
 
 ### Installation
 
@@ -184,14 +177,14 @@ skills/
 git clone https://github.com/johnruiz24/deepagents-ralph-loop.git
 cd deepagents-ralph-loop
 
-# Create virtual environment
+# Create and activate virtual environment
 python -m venv .venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
 # Install dependencies
 pip install -e ".[dev]"
 
-# Copy environment template and configure
+# Configure environment
 cp .env.example .env
 # Edit .env with your AWS credentials and API keys
 ```
@@ -199,67 +192,58 @@ cp .env.example .env
 ### Running the System
 
 ```bash
-# Run end-to-end newsletter generation
+# End-to-end newsletter generation
 PYTHONPATH=. python run_e2e_test.py
 
-# Or with a custom topic
-PYTHONPATH=. python -c "
-import asyncio
-from src.orchestrator.orchestrator import generate_newsletter
-
-asyncio.run(generate_newsletter(
-    topic='Your Topic Here',
-    target_audience='TUI Leadership',
-    key_concepts=['Concept 1', 'Concept 2'],
-))
-"
+# Or run with custom topic
+PYTHONPATH=. python run_cli.py
 ```
 
----
+### Example Output Structure
 
-## Output Structure
-
-Each newsletter run creates a timestamped output directory:
+Each newsletter run generates a timestamped deliverable:
 
 ```
 output/
-└── 20260203_143022_Topic_Name/
+└── 20260330_143022_Topic_Name/
     ├── input/
     │   ├── user_prompt.json
     │   └── topics_and_subtopics.json
     ├── research/
     │   ├── research_plan.json
     │   ├── raw_data/
-    │   └── tui_strategy_summary.md
+    │   └── strategy_summary.md
     ├── content/
     │   ├── draft_article.md
     │   └── final_article.md
     ├── visuals/
-    │   ├── chart_1_*.png          # Dynamically named!
-    │   ├── chart_2_*.png
+    │   ├── chart_1_market_trends.png      # Dynamically named!
+    │   ├── chart_2_adoption_curve.png
     │   └── asset_manifest.json
     ├── multimedia/
-    │   └── narration_*.mp3
+    │   └── narration_professional.mp3
     └── final_deliverables/
-        ├── newsletter_*.pdf
-        ├── newsletter_*.html
-        ├── *.png (copied visuals)
-        ├── *.mp3 (copied audio)
-        └── newsletter_*.zip
+        ├── newsletter_final.pdf           # 300 DPI, HBR-quality
+        ├── newsletter_final.html
+        ├── assets/ (all visuals + audio)
+        └── newsletter.zip
 ```
 
 ---
 
 ## Example Outputs
 
-### Test 1: "Universal Commerce Protocol"
-- 3 charts generated
-- PDF: 461 KB
+### "Universal Commerce Protocol" Analysis
+- **Research**: 15 premium sources queried in parallel
+- **Visuals**: 3 custom charts generated (no hardcoding!)
+- **Content**: 2,400 words with 5 pull quotes
+- **Final**: 461 KB publication-ready PDF
 
-### Test 2: "The AI Paradox in Travel"
-- 4 charts generated (different content!)
-- PDF: 965 KB
-- Includes "Automation Paradox: Efficiency vs Customer Satisfaction" chart
+### "AI Paradox in Travel Industry"
+- **Research**: Strategic context + 12 industry sources
+- **Visuals**: 4 dynamic charts (different content = different charts!)
+- **Content**: 2,350 words with "Automation Paradox" visualization
+- **Final**: 965 KB PDF + MP3 narration
 
 ---
 
@@ -268,18 +252,27 @@ output/
 ### Project Structure
 
 ```
-agent-newsletter/
+ralph-deep-agents-loop/
 ├── src/
-│   ├── agents/           # 8 specialized agents
-│   ├── orchestrator/     # Central workflow coordinator
-│   ├── state/            # Shared state management
-│   ├── quality_gates/    # Validation at each phase
-│   └── utils/            # Logging, Bedrock config
-├── skills/               # Reusable skill modules
+│   ├── agents/              # 8 specialized agent implementations
+│   │   ├── base_agent.py
+│   │   ├── research_agent.py
+│   │   ├── synthesis_agent.py
+│   │   ├── hbr_editor_agent.py
+│   │   ├── visual_asset_agent.py
+│   │   ├── multimedia_agent.py
+│   │   ├── assembly_agent.py
+│   │   └── query_formulation_agent.py
+│   ├── orchestrator/        # Central workflow coordinator
+│   ├── state/               # Shared state management
+│   ├── quality_gates/       # Validation at each phase
+│   ├── tools/               # Web search, PDF generation
+│   └── utils/               # Logging, AWS config
+├── skills/                  # Reusable skill modules
 │   └── visual_generation/
-├── tests/                # Test suite
-├── docs/                 # Documentation
-└── output/               # Generated newsletters (gitignored)
+├── tests/                   # Comprehensive test suite
+├── docs/                    # Architecture documentation
+└── output/                  # Generated newsletters (gitignored)
 ```
 
 ### Running Tests
@@ -288,29 +281,76 @@ agent-newsletter/
 # Run all tests
 pytest
 
-# Run with coverage
+# With coverage
 pytest --cov=src --cov-report=html
+
+# Specific test
+pytest tests/test_agents/test_research_pipeline.py -v
 ```
 
 ### Code Quality
 
 ```bash
-# Lint with ruff
+# Lint
 ruff check src/
 
 # Type checking
 mypy src/
+
+# Format
+ruff format src/
 ```
 
 ---
 
 ## Tech Stack
 
-- **LLM**: Claude via AWS Bedrock
-- **Orchestration**: LangGraph
-- **Visuals**: matplotlib, seaborn, diagrams, plotly
-- **Audio**: Amazon Polly / OpenAI TTS
-- **PDF**: WeasyPrint
+| Component | Technology | Purpose |
+|-----------|-----------|---------|
+| **LLM** | AWS Bedrock (Claude) | Content generation & analysis |
+| **Orchestration** | LangGraph | Agent workflow coordination |
+| **Web Search** | Tavily API | Multi-source research |
+| **Visualization** | matplotlib, seaborn, diagrams, plotly | Chart & diagram generation |
+| **Audio** | Amazon Polly / ElevenLabs | Narration synthesis |
+| **PDF Generation** | WeasyPrint | Publication formatting |
+| **Testing** | pytest | Test automation |
+
+---
+
+## Configuration
+
+All configuration is environment-based for flexibility:
+
+### AWS Configuration
+
+```bash
+# AWS credentials (required)
+AWS_PROFILE=your-profile
+AWS_REGION=eu-central-1
+
+# Bedrock model IDs
+ANTHROPIC_MODEL_OPUS=<your-opus-model>
+ANTHROPIC_MODEL_HAIKU=<your-haiku-model>
+ANTHROPIC_MODEL_SONNET=<your-sonnet-model>
+```
+
+### API Keys
+
+```bash
+TAVILY_API_KEY=<your-tavily-key>
+ELEVENLABS_API_KEY=<your-elevenlabs-key>
+LANGCHAIN_API_KEY=<your-langsmith-key>
+```
+
+### Quality Parameters
+
+```bash
+RESEARCH_QUALITY_THRESHOLD=85
+SOURCE_COUNT_THRESHOLD=5
+READABILITY_THRESHOLD=60
+MIN_ARTICLE_WORDS=2000
+MAX_ARTICLE_WORDS=2500
+```
 
 ---
 
@@ -323,10 +363,76 @@ mypy src/
 
 ---
 
+## Performance Characteristics
+
+### Execution Time (by Phase)
+
+| Phase | Time | Notes |
+|-------|------|-------|
+| Query Formulation | ~10s | Planning stage |
+| Research (3 parallel) | ~60-90s | Multiple source queries |
+| Strategic Analysis | ~15s | Business context |
+| Synthesis | ~45s | LLM processing |
+| HBR Editing | ~30s | Professional styling |
+| Visual Generation | ~40s | Chart rendering |
+| Multimedia | ~20s | Audio synthesis |
+| Assembly | ~10s | PDF compilation |
+| **TOTAL** | **~4-5 minutes** | End-to-end |
+
+### Output Size
+
+- **PDF**: 400-1200 KB (depending on visuals count)
+- **HTML**: 150-400 KB
+- **Audio MP3**: 800 KB - 2.5 MB
+- **Complete ZIP**: 1.5 - 5 MB
+
+---
+
 ## License
 
-MIT License - See LICENSE file for details
+MIT License - See [LICENSE](LICENSE) file for details
 
-## Support
+## Citation
 
-For questions and issues, please open a GitHub issue on this repository.
+If you use Ralph in your research or projects, please cite:
+
+```bibtex
+@software{ralph_2024,
+  title={Ralph: Multi-Agent System for Enterprise Content Generation},
+  author={Ruiz, John},
+  year={2024},
+  url={https://github.com/johnruiz24/deepagents-ralph-loop}
+}
+```
+
+## Support & Contributing
+
+- **Issues**: [GitHub Issues](https://github.com/johnruiz24/deepagents-ralph-loop/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/johnruiz24/deepagents-ralph-loop/discussions)
+- **Contributing**: Pull requests welcome!
+
+---
+
+## Roadmap
+
+### Q2 2024
+- [ ] Web UI dashboard for workflow monitoring
+- [ ] Additional chart types (Sankey, network diagrams)
+- [ ] Real-time streaming output
+- [ ] Custom branding templates
+
+### Q3 2024
+- [ ] Multi-language support
+- [ ] Video generation integration
+- [ ] Scheduled newsletter automation
+- [ ] Slack/Teams integration
+
+---
+
+<div align="center">
+
+**Built with ❤️ for enterprise content excellence**
+
+[GitHub](https://github.com/johnruiz24/deepagents-ralph-loop) • [Documentation](docs/) • [Report Issue](https://github.com/johnruiz24/deepagents-ralph-loop/issues)
+
+</div>
