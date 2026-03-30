@@ -42,9 +42,6 @@ env/
 .DS_Store
 Thumbs.db
 
-# Output directories (generated content)
-outputs/
-final_deliverables/
 
 # Workspace (local testing)
 workspace/
