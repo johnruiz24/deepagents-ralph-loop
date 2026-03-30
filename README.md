@@ -404,10 +404,10 @@ MIT License - See [LICENSE](LICENSE) file for details
 If you use Ralph in your research or projects, please cite:
 
 ```bibtex
-@software{ralph_2024,
+@software{ralph_2026,
   title={Ralph: Multi-Agent System for Enterprise Content Generation},
   author={Ruiz, John},
-  year={2024},
+  year={2026},
   url={https://github.com/johnruiz24/deepagents-ralph-loop}
 }
 ```
