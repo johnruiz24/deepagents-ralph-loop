@@ -206,28 +206,39 @@ Each newsletter run generates a timestamped deliverable:
 
 ```
 output/
-└── 20260330_143022_Topic_Name/
-    ├── input/
-    │   ├── user_prompt.json
-    │   └── topics_and_subtopics.json
-    ├── research/
-    │   ├── research_plan.json
-    │   ├── raw_data/
-    │   └── strategy_summary.md
-    ├── content/
-    │   ├── draft_article.md
-    │   └── final_article.md
-    ├── visuals/
-    │   ├── chart_1_market_trends.png      # Dynamically named!
-    │   ├── chart_2_adoption_curve.png
-    │   └── asset_manifest.json
-    ├── multimedia/
-    │   └── narration_professional.mp3
-    └── final_deliverables/
-        ├── newsletter_final.pdf           # 300 DPI, HBR-quality
-        ├── newsletter_final.html
-        ├── assets/ (all visuals + audio)
-        └── newsletter.zip
+└── input/
+    ├── user_prompt.json
+    └── topics_and_subtopics.json
+├── research/
+    ├── research_plan.json
+    ├── raw_data/
+    │   ├── topic_1/
+    │   ├── topic_2/
+    │   └── topic_3/
+    └── tui_strategy_summary.md
+├── content/
+    ├── draft_article.md
+    └── final_article.md
+├── visuals/
+    ├── chart_1_universal_commerce_p_framework.png
+    ├── chart_2_universal_commerce_p_transformation.png
+    ├── chart_3_universal_commerce_p_roi_timeline.png
+    ├── chart_4_universal_commerce_p_competitive.png
+    ├── chart_5_universal_commerce_p_roadmap.png
+    └── asset_manifest.json
+├── multimedia/
+    ├── narration_universal_commerce_protocol_*.mp3
+    └── scripts/
+        ├── narration_script.txt
+        └── video_script.json
+├── final_deliverables/
+    ├── newsletter_*.pdf                   # 300 DPI, HBR-quality
+    ├── newsletter_*.html
+    ├── newsletter_*.zip
+    └── manifest.json
+├── iteration_log.md
+├── state.json
+└── state_snapshot.json
 ```
 
 ---
@@ -270,10 +281,15 @@ ralph-deep-agents-loop/
 │   ├── ralph_mode.py       # Advanced orchestration
 │   └── run_*.py            # Other runners
 ├── tests/                   # Comprehensive test suite
-├── docs/                    # Architecture documentation
 ├── assets/                  # Hero images for README
-├── diagrams/                # Architecture diagrams
-└── output/                  # Generated newsletters (gitignored)
+├── output/                  # Generated newsletters
+│   ├── input/               # Input data (prompts, topics)
+│   ├── research/            # Research phase outputs
+│   ├── content/             # Content generation outputs
+│   ├── visuals/             # Generated charts & diagrams
+│   ├── multimedia/          # Audio narration
+│   └── final_deliverables/  # PDF, HTML, ZIP packages
+└── docs/                    # Documentation (moved structure documentation)
 ```
 
 ### Running Tests
@@ -429,11 +445,6 @@ If you use Ralph in your research or projects, please cite:
 - [ ] Video generation integration
 - [ ] Scheduled newsletter automation
 - [ ] Slack/Teams integration
-
-### Long-term Vision
-- [ ] Agent fine-tuning on custom data
-- [ ] Advanced analytics and optimization
-- [ ] Enterprise deployment support
 
 ---
 
