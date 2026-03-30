@@ -430,24 +430,6 @@ If you use Ralph in your research or projects, please cite:
 
 ---
 
-## Tentative Roadmap
-
-**Note:** This roadmap represents our vision. Priorities may shift based on community feedback and production insights.
-
-### Q2 2024 (Planned)
-- [ ] Web UI dashboard for workflow monitoring
-- [ ] Additional chart types (Sankey, network diagrams)
-- [ ] Real-time streaming output
-- [ ] Custom branding templates
-
-### Q3 2024 (Planned)
-- [ ] Multi-language support
-- [ ] Video generation integration
-- [ ] Scheduled newsletter automation
-- [ ] Slack/Teams integration
-
----
-
 <div align="center">
 
 **Built with ❤️ for enterprise content excellence**
