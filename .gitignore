@@ -44,7 +44,11 @@ Thumbs.db
 
 # Output directories (generated content)
 output/
+outputs/
 final_deliverables/
+
+# Workspace (local testing)
+workspace/
 
 # Test artifacts
 .coverage

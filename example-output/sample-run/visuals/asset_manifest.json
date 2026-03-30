@@ -1,0 +1,45 @@
+{
+  "charts": [
+    {
+      "filename": "chart_1_market_trends.png",
+      "type": "line_chart",
+      "title": "OTA vs Vertical Integration: Growth Trajectories",
+      "size_bytes": 245000,
+      "dpi": 300
+    },
+    {
+      "filename": "chart_2_adoption_curve.png",
+      "type": "area_chart",
+      "title": "UCP Adoption Forecast (2025-2030)",
+      "size_bytes": 287000,
+      "dpi": 300
+    },
+    {
+      "filename": "chart_3_competitive_analysis.png",
+      "type": "bar_chart",
+      "title": "Operational Efficiency: Asset-Light vs Integrated",
+      "size_bytes": 265000,
+      "dpi": 300
+    },
+    {
+      "filename": "chart_4_timeline.png",
+      "type": "timeline",
+      "title": "UCP Protocol Evolution (2023-2025)",
+      "size_bytes": 198000,
+      "dpi": 300
+    },
+    {
+      "filename": "chart_5_architecture.png",
+      "type": "architecture_diagram",
+      "title": "UCP vs Traditional API Architecture",
+      "size_bytes": 312000,
+      "dpi": 300
+    }
+  ],
+  "summary": {
+    "total_charts": 5,
+    "total_size_mb": 1.31,
+    "quality": "300 DPI professional print-ready",
+    "all_dynamically_generated": true
+  }
+}
