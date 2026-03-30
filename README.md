@@ -202,40 +202,34 @@ PYTHONPATH=. python scripts/ralph_mode.py
 
 ### Example Output Structure
 
-Each newsletter run generates a timestamped deliverable:
+Each newsletter run generates deliverables in the output directory:
 
 ```
 output/
-└── input/
-    ├── user_prompt.json
-    └── topics_and_subtopics.json
+├── input/
+│   ├── user_prompt.json
+│   └── topics_and_subtopics.json
 ├── research/
-    ├── research_plan.json
-    ├── raw_data/
-    │   ├── topic_1/
-    │   ├── topic_2/
-    │   └── topic_3/
-    └── tui_strategy_summary.md
+│   ├── research_plan.json
+│   ├── raw_data/
+│   │   ├── Business implications for online travel agencies/
+│   │   ├── Competitive landscape and adoption trends/
+│   │   └── Technical architecture of UCP/
+│   └── tui_strategy_summary.md
 ├── content/
-    ├── draft_article.md
-    └── final_article.md
-├── visuals/
-    ├── chart_1_universal_commerce_p_framework.png
-    ├── chart_2_universal_commerce_p_transformation.png
-    ├── chart_3_universal_commerce_p_roi_timeline.png
-    ├── chart_4_universal_commerce_p_competitive.png
-    ├── chart_5_universal_commerce_p_roadmap.png
-    └── asset_manifest.json
+│   └── draft_article.md
 ├── multimedia/
-    ├── narration_universal_commerce_protocol_*.mp3
-    └── scripts/
-        ├── narration_script.txt
-        └── video_script.json
+│   └── narration_universal_commerce_protocol_ucp_tuis_architecture_for_autonomous_travel_commerce.mp3
 ├── final_deliverables/
-    ├── newsletter_*.pdf                   # 300 DPI, HBR-quality
-    ├── newsletter_*.html
-    ├── newsletter_*.zip
-    └── manifest.json
+│   ├── chart_1_universal_commerce_p_framework.png
+│   ├── chart_2_universal_commerce_p_transformation.png
+│   ├── chart_3_universal_commerce_p_roi_timeline.png
+│   ├── chart_4_universal_commerce_p_competitive.png
+│   ├── chart_5_universal_commerce_p_roadmap.png
+│   ├── newsletter_universal_commerce_protocol_ucp_tuis_architecture_for_autonomous_travel_commerce.pdf
+│   ├── newsletter_universal_commerce_protocol_ucp_tuis_architecture_for_autonomous_travel_commerce.html
+│   ├── newsletter_universal_commerce_protocol_ucp_tuis_architecture_for_autonomous_travel_commerce_20260330.zip
+│   └── manifest.json
 ├── iteration_log.md
 ├── state.json
 └── state_snapshot.json
@@ -274,22 +268,18 @@ ralph-deep-agents-loop/
 │   ├── image_generation/    # Visual asset creation
 │   └── utils/               # Logging, AWS config
 ├── skills/                  # Reusable skill modules
-│   └── visual_generation/   # Charts, diagrams, timelines
+│   ├── hbr-article-standards/  # HBR writing standards & templates
+│   └── visual_generation/      # Charts, diagrams, timelines
 ├── scripts/                 # Runner and utility scripts
-│   ├── run_cli.py          # Interactive CLI runner
-│   ├── run_e2e_test.py     # End-to-end test
-│   ├── ralph_mode.py       # Advanced orchestration
-│   └── run_*.py            # Other runners
+│   ├── run_cli.py
+│   ├── run_e2e_test.py
+│   ├── ralph_mode.py
+│   └── run_*.py
 ├── tests/                   # Comprehensive test suite
 ├── assets/                  # Hero images for README
-├── output/                  # Generated newsletters
-│   ├── input/               # Input data (prompts, topics)
-│   ├── research/            # Research phase outputs
-│   ├── content/             # Content generation outputs
-│   ├── visuals/             # Generated charts & diagrams
-│   ├── multimedia/          # Audio narration
-│   └── final_deliverables/  # PDF, HTML, ZIP packages
-└── docs/                    # Documentation (moved structure documentation)
+├── output/                  # Generated newsletters (tracked)
+├── workspace/               # Local testing artifacts
+└── LICENSE
 ```
 
 ### Running Tests
