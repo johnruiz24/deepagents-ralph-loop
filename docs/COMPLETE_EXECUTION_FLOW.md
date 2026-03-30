@@ -14,32 +14,47 @@ This document traces the complete execution path of the InkForge Ralph newslette
 
 ## 1. System Architecture Overview
 
-```mermaid
-graph TB
-    User[User Prompt] --> Orch[Orchestrator]
+```
+                          ┏━━━━━━━━━━━━━━┓
+                          ┃ User Prompt  ┃
+                          ┗━━━━┬━━━━━━━━┛
+                                │
+                          ┏━━━━▼━━━━━━━━┓
+                          ┃ Orchestrator ┃
+                          ┗━━━━┬━━━━━━━━┛
+                                │
+        ┌───────────────────────┼───────────────────────┐
+        │                       │                       │
+    ┌───▼────┐          ┌───────▼──────┐        ┌───────▼──────┐
+    │ Phase 1 │          │   Phase 2    │        │   Phase 3    │
+    │ Query   │          │ Research     │        │ TUI Analysis │
+    │ Form.   │          │ (Parallel)   │        │              │
+    └───┬────┘          └───────┬──────┘        └───────┬──────┘
+        │                       │                       │
+    ┌───▼────┐          ┌───────▼──────┐        ┌───────▼──────┐
+    │ Phase 4 │          │   Phase 5    │        │   Phase 6    │
+    │Synthesis│          │ HBR Editing  │        │ Visual Assets│
+    └───┬────┘          └───────┬──────┘        └───────┬──────┘
+        │                       │                       │
+    ┌───▼────┐          ┌───────▼──────┐        ┌───────▼──────┐
+    │ Phase 7 │          │   Phase 8    │◄───────│ Assembly     │
+    │Multimedia           │              │        │              │
+    └───┬────┘          └───────┬──────┘        └──────────────┘
+        │                       │
+        └───────────────────────▼────────────────────────┐
+                                │
+                        ┏━━━━━━▼━━━━━━━━┓
+                        ┃    Output      ┃
+                        ┃   Newsletter   ┃
+                        ┃ (PDF/HTML/ZIP) ┃
+                        ┗━━━━━━━━━━━━━━━┛
 
-    Orch --> Phase1[Phase 1: Query Formulation]
-    Phase1 --> Phase2[Phase 2: Parallel Research]
-    Phase2 --> Phase3[Phase 3: TUI Strategy Analysis]
-    Phase3 --> Phase4[Phase 4: Synthesis]
-    Phase4 --> Phase5[Phase 5: HBR Editing]
-    Phase5 --> Phase6[Phase 6: Visual Assets]
-    Phase6 --> Phase7[Phase 7: Multimedia]
-    Phase7 --> Phase8[Phase 8: Final Assembly]
-
-    Phase8 --> Output[Newsletter Package]
-
-    State[(Shared State<br/>File System)] -.-> Phase1
-    State -.-> Phase2
-    State -.-> Phase3
-    State -.-> Phase4
-    State -.-> Phase5
-    State -.-> Phase6
-    State -.-> Phase7
-    State -.-> Phase8
-
-    style Phase2 fill:#90EE90
-    style State fill:#FFE4B5
+Shared State: Maintained across all phases (File System)
+  ├─ Timestamps & metadata
+  ├─ Research results
+  ├─ Draft articles
+  ├─ Visual assets
+  └─ Final outputs
 ```
 
 ### Orchestration Layer
@@ -73,35 +88,50 @@ Key features:
 
 ### Real Example: UCP Newsletter (2026-02-17 20:35:15)
 
-```mermaid
-gantt
-    title Newsletter Generation Timeline (Total: 566s)
-    dateFormat  ss
-    axisFormat %Ss
+```
+Newsletter Generation Timeline (Total: 566 seconds)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-    section Phase 1
-    Query Formulation :done, p1, 0, 11s
+Phase 1: Query Formulation
+0s ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ┤ 11s
+   └─────────────────────────────────┘ 10.6s
 
-    section Phase 2
-    Parallel Research :done, p2, 11, 41s
+Phase 2: Parallel Research (3 concurrent sub-agents)
+11s ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ┤ 41s
+   └─────────────────────────────────────────────────────────────┘ 30.5s ⚡ 3.0× SPEEDUP
 
-    section Phase 3
-    TUI Analysis :done, p3, 41, 71s
+Phase 3: TUI Strategy Analysis
+41s ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ┤ 71s
+   └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ 30.5s
 
-    section Phase 4
-    Synthesis :done, p4, 71, 232s
+Phase 4: Synthesis & Insights
+71s ├─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤ 232s
+   └─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ 161.3s
 
-    section Phase 5
-    HBR Editing :done, p5, 232, 530s
+Phase 5: HBR Editing (Most time-consuming)
+232s ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤ 530s
+    └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ 298.1s
 
-    section Phase 6
-    Visual Assets :done, p6, 530, 538s
+Phase 6: Visual Assets
+530s ├─ ┤ 538s
+    └────┘ 7.6s
 
-    section Phase 7
-    Multimedia :done, p7, 538, 580s
+Phase 7: Multimedia (Audio Narration)
+538s ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ┤ 580s
+    └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ 42.0s
 
-    section Phase 8
-    Assembly :done, p8, 580, 596s
+Phase 8: Final Assembly
+580s ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ├─ ┤ 596s
+    └──────────────────────────────────────────────────────────────────────┘ 16.1s
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TOTAL: 9.4 minutes (566 seconds)
+
+Key Bottleneck: Phase 5 (HBR Editing) = 298.1s (52.7% of total time)
+  → Multiple LLM calls for style refinement
+  → Professional tone calibration
+  → Quality validation loops
 ```
 
 ### Phase-by-Phase Breakdown
@@ -125,52 +155,105 @@ gantt
 
 ### Complete Data Pipeline
 
-```mermaid
-flowchart TD
-    A[User Input] -->|JSON| B[user_prompt.json]
-    B --> C[Query Formulation Agent]
-    C -->|JSON| D[research_plan.json]
-
-    D --> E[Parallel Research Agent]
-    E -->|3 Sub-Agents| F1[SubAgent 1]
-    E -->|asyncio.gather| F2[SubAgent 2]
-    E -->|Semaphore 5| F3[SubAgent 3]
-
-    F1 -->|4 articles| G[raw_data/subtopic_1/]
-    F2 -->|4 articles| H[raw_data/subtopic_2/]
-    F3 -->|4 articles| I[raw_data/subtopic_3/]
-
-    G --> J[TUI Strategy Agent]
-    H --> J
-    I --> J
-    J -->|MD| K[tui_strategy_summary.md]
-
-    K --> L[Synthesis Agent]
-    G --> L
-    H --> L
-    I --> L
-    L -->|MD| M[draft_article.md]
-
-    M --> N[HBR Editor Agent]
-    N -->|MD| O[final_article.md]
-
-    O --> P[Visual Asset Agent]
-    P -->|5 PNG| Q[visuals/chart_*.png]
-
-    O --> R[Multimedia Agent]
-    R -->|MP3| S[multimedia/narration_*.mp3]
-
-    O --> T[Assembly Agent]
-    Q --> T
-    S --> T
-    T -->|PDF| U[final_deliverables/newsletter_*.pdf]
-    T -->|HTML| V[final_deliverables/newsletter_*.html]
-    T -->|ZIP| W[final_deliverables/newsletter_*.zip]
-
-    style E fill:#90EE90
-    style F1 fill:#90EE90
-    style F2 fill:#90EE90
-    style F3 fill:#90EE90
+```
+User Input (Topic + Concepts)
+      │
+      ▼
+┌──────────────────────────┐
+│ user_prompt.json         │
+└──────────┬───────────────┘
+           │
+           ▼
+   ┏━━━━━━━━━━━━━━━━┓
+   ┃ Query          ┃
+   ┃ Formulation    ┃
+   ┃ Agent          ┃
+   ┗━━━━━┬──────────┛
+         │
+         ▼
+   ┌─────────────────────────┐
+   │ research_plan.json      │
+   │ (3 sub-topics, 15 qry)  │
+   └────────┬────────────────┘
+            │
+            ▼
+     ┏━━━━━━━━━━━━━━━━━┓
+     ┃ PARALLEL        ┃    ⚡ 3.0× SPEEDUP
+     ┃ RESEARCH        ┃
+     ┃ (3 Concurrent)  ┃
+     ┗────┬──┬──┬──────┘
+         │  │  │
+    ┌────▼─┐│ ┌┴─────┐
+    │ Sub1 ││ │ Sub2 │ (asyncio.gather)
+    │      ├┼─┤      │
+    └─┬────┘│ └──┬───┘
+      │     │    │
+      │  ┌──┴───┐│
+      │  │ Sub3 ││ (Semaphore 5)
+      │  │      ││
+      ▼  ▼      ▼▼
+  ┌──────────────────────────┐
+  │ raw_data/               │
+  │ ├─ subtopic_1/ (4 articles)
+  │ ├─ subtopic_2/ (4 articles)
+  │ └─ subtopic_3/ (4 articles)
+  │ TOTAL: 12 articles (~36K words)
+  └──────┬───────────────────┘
+         │
+         ├─────────────────────────┐
+         │                         │
+         ▼                         ▼
+    ┏━━━━━━━━━━━━━┓        ┏━━━━━━━━━━━━━┓
+    ┃ TUI Strategy ┃        ┃ Synthesis   ┃
+    ┃ Agent        ┃        ┃ Agent       ┃
+    ┗━━━┬──────────┛        ┗━━━┬──────────┛
+        │                       │
+        ▼                       ▼
+    ┌────────────────┐      ┌────────────────┐
+    │ tui_strategy   │      │ draft_article  │
+    │ _summary.md    │      │ .md            │
+    │ (852 lines)    │      │ (3,102 words)  │
+    └───┬────────────┘      └─────┬──────────┘
+        │                         │
+        └────────────┬────────────┘
+                     │
+                     ▼
+            ┏━━━━━━━━━━━━━━━┓
+            ┃ HBR Editor    ┃ ⏱️ 298.1s (BOTTLENECK: 52.7%)
+            ┃ Agent         ┃
+            ┗━━━┬───────────┛
+                │
+                ▼
+        ┌─────────────────────┐
+        │ final_article.md    │
+        │ (2,206 words)       │
+        │ Quality: 70/100 HBR │
+        └────┬──┬─────────┬───┘
+             │  │         │
+        ┌────▼──▼┐   ┌────▼────┐   ┌──────────────┐
+        │ Visual │   │Multimedia   │ Assembly     │
+        │ Assets │   │ Agent       │ Agent        │
+        │ Agent  │   │            │              │
+        └────┬───┘   └────┬──────┘   ├─────────────┘
+             │             │         │
+             ▼             ▼         ▼
+        ┌─────────┐   ┌──────────┐
+        │ chart_  │   │narration_ │
+        │1-5.png  │   │*.mp3      │ (529.2s audio)
+        │(5 @300  │   │           │
+        │ DPI)    │   │           │
+        └────┬────┘   └──┬────────┘
+             │           │
+             └────┬──────┘
+                  │
+                  ▼ (Assembly Agent)
+        ┌─────────────────────────────┐
+        │ OUTPUT DELIVERABLES         │
+        ├─────────────────────────────┤
+        │ ✓ newsletter_final.pdf      │ (300 DPI)
+        │ ✓ newsletter_final.html     │ (responsive)
+        │ ✓ newsletter_final.zip      │ (complete pkg)
+        └─────────────────────────────┘
 ```
 
 ### State Snapshots at Each Stage

@@ -414,19 +414,26 @@ If you use Ralph in your research or projects, please cite:
 
 ---
 
-## Roadmap
+## Tentative Roadmap
 
-### Q2 2024
+**Note:** This roadmap represents our vision. Priorities may shift based on community feedback and production insights.
+
+### Q2 2024 (Planned)
 - [ ] Web UI dashboard for workflow monitoring
 - [ ] Additional chart types (Sankey, network diagrams)
 - [ ] Real-time streaming output
 - [ ] Custom branding templates
 
-### Q3 2024
+### Q3 2024 (Planned)
 - [ ] Multi-language support
 - [ ] Video generation integration
 - [ ] Scheduled newsletter automation
 - [ ] Slack/Teams integration
+
+### Long-term Vision
+- [ ] Agent fine-tuning on custom data
+- [ ] Advanced analytics and optimization
+- [ ] Enterprise deployment support
 
 ---
 
