@@ -2,6 +2,7 @@
 
 import base64
 import json
+import os
 import boto3
 from pathlib import Path
 from datetime import datetime
@@ -16,7 +17,7 @@ def generate_titan_image(
     height: int = 1024,
     cfg_scale: float = 8.0,
     seed: Optional[int] = None,
-    profile_name: str = "mll-dev",
+    profile_name: str = None,
 ) -> dict:
     """
     Generate an image using AWS Bedrock Titan Image Generator.
@@ -35,6 +36,8 @@ def generate_titan_image(
         Dictionary with image path and metadata
     """
     try:
+        # Use provided profile or from env var
+        profile_name = profile_name or os.getenv("AWS_PROFILE")
         # Create Bedrock client
         session = boto3.Session(profile_name=profile_name)
         bedrock_runtime = session.client(

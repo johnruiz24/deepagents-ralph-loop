@@ -2,9 +2,9 @@
 
 Supports Cross-Region Inference (CRIS) with EU models.
 Default configuration:
-- Profile: mll-sandbox (configurable via AWS_PROFILE)
-- Region: eu-central-1
-- Model: eu.anthropic.claude-opus-4-5-20251101-v1:0 (CRIS)
+- Profile: Your AWS profile (configurable via AWS_PROFILE)
+- Region: eu-central-1 (configurable via AWS_REGION)
+- Models: Configure via env vars (ANTHROPIC_MODEL_OPUS, etc)
 """
 
 import os
@@ -18,11 +18,11 @@ from langchain_aws import ChatBedrockConverse
 # Model presets for different use cases
 MODEL_PRESETS = {
     # Primary model for high-quality content generation (CRIS)
-    "opus": "eu.anthropic.claude-opus-4-5-20251101-v1:0",
+    "opus": os.getenv("ANTHROPIC_MODEL_OPUS", "<<PUT YOUR BEDROCK OPUS MODEL HERE>>"),
     # Fast model for quick tasks
-    "haiku": "eu.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "haiku": os.getenv("ANTHROPIC_MODEL_HAIKU", "<<PUT YOUR BEDROCK HAIKU MODEL HERE>>"),
     # Sonnet for balanced performance
-    "sonnet": "eu.anthropic.claude-sonnet-4-5-20250929-v1:0",
+    "sonnet": os.getenv("ANTHROPIC_MODEL_SONNET", "<<PUT YOUR BEDROCK SONNET MODEL HERE>>"),
 }
 
 
@@ -57,13 +57,13 @@ def create_boto_session(profile_name: Optional[str] = None) -> boto3.Session:
     Create boto3 session with optional profile.
 
     Args:
-        profile_name: AWS profile name (default: from AWS_PROFILE env var or mll-sandbox)
+        profile_name: AWS profile name (default: from AWS_PROFILE env var)
 
     Returns:
         Configured boto3 Session
     """
-    profile = profile_name or os.getenv("AWS_PROFILE", "mll-sandbox")
-    return boto3.Session(profile_name=profile)
+    profile = profile_name or os.getenv("AWS_PROFILE")
+    return boto3.Session(profile_name=profile) if profile else boto3.Session()
 
 
 def create_bedrock_llm(
@@ -85,7 +85,7 @@ def create_bedrock_llm(
         temperature: Sampling temperature (default: 0.7)
         max_tokens: Maximum tokens to generate (default: 4096)
         region_name: AWS region (default: from AWS_REGION env var or eu-central-1)
-        profile_name: AWS profile (default: from AWS_PROFILE env var or mll-sandbox)
+        profile_name: AWS profile (default: from AWS_PROFILE env var)
 
     Returns:
         Configured ChatBedrockConverse instance
@@ -103,7 +103,7 @@ def create_bedrock_llm(
     boto_config = get_boto_config()
 
     # Create credentials provider if profile specified
-    credentials_profile = profile_name or os.getenv("AWS_PROFILE", "mll-sandbox")
+    credentials_profile = profile_name or os.getenv("AWS_PROFILE")
 
     return ChatBedrockConverse(
         model=model_id,

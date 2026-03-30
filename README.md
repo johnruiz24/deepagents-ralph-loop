@@ -1,8 +1,8 @@
-# InkForge
+# Ralph Deep Agents Loop
 
-> **Agentic Newsletter Generation System for TUI Leadership**
+> **Multi-Agent Deep Collaborative System for Enterprise Content Generation**
 
-Transform strategic insights into HBR-quality newsletters with AI-powered research, dynamic visualization, and professional publishing.
+Transform complex research into beautifully illustrated, HBR-quality strategic narratives with deep-agent coordination, dynamic visualization, and professional-grade publishing.
 
 ![9-Agent](https://img.shields.io/badge/Agents-9-blue) ![Skills](https://img.shields.io/badge/Skills--as--Tools-✓-green) ![HBR](https://img.shields.io/badge/HBR-A%2B%20Grade-red)
 
@@ -10,7 +10,7 @@ Transform strategic insights into HBR-quality newsletters with AI-powered resear
 
 ## Overview
 
-The Agent Newsletter System automates the entire newsletter production pipeline—from research and analysis to professional PDF/HTML generation with embedded visuals and audio narration.
+Ralph is a sophisticated multi-agent orchestration framework that automates the complete content generation pipeline—from multi-sourced research and strategic analysis to publication-ready PDF/HTML deliverables with custom visualizations and audio narration. Built for enterprise-grade content quality with Harvard Business Review standards.
 
 ### Key Features
 
@@ -173,29 +173,27 @@ skills/
 ### Prerequisites
 
 - Python 3.12+
-- AWS credentials configured (for Bedrock, Polly)
-- Tavily API key (for web search)
+- AWS credentials configured (for Bedrock image/audio generation)
+- Tavily API key (for intelligent web search)
+- Optional: ElevenLabs API key (for premium audio narration)
 
 ### Installation
 
 ```bash
 # Clone the repository
-git clone git@ssh.source.tui:ml-lab/incubator/agent-newsletter.git
-cd agent-newsletter
-
-# Checkout the skills branch
-git checkout feature/agentic-skills
+git clone https://github.com/johnruiz24/deepagents-ralph-loop.git
+cd deepagents-ralph-loop
 
 # Create virtual environment
 python -m venv .venv
-source .venv/bin/activate
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
 # Install dependencies
 pip install -e ".[dev]"
 
-# Copy environment template
+# Copy environment template and configure
 cp .env.example .env
-# Edit .env with your API keys
+# Edit .env with your AWS credentials and API keys
 ```
 
 ### Running the System
@@ -320,31 +318,15 @@ mypy src/
 
 | Branch | Description | Status |
 |--------|-------------|--------|
-| `main` | Stable release | ✅ |
-| `feature/agentic-skills` | Skills architecture + dynamic visualization | ✅ |
-| `feature/hbr-quality` | HBR A+ grade structural elements | ✅ NEW |
-
-### Branch Comparison
-
-```
-feature/agentic-skills          feature/hbr-quality
-        │                               │
-        ├── Dynamic charts              ├── All from agentic-skills
-        ├── LLM-driven visuals          ├── + Author byline
-        ├── Skills as tools             ├── + Idea in Brief sidebar
-        └── 5 chart types               ├── + Pull quotes
-                                        ├── + Persuasive tone prompts
-                                        └── + HBR CSS styling
-```
+| `main` | Production-ready release | ✅ |
+| `dev` | Development branch | 🔧 |
 
 ---
 
 ## License
 
-Internal TUI Group - ML Lab Incubator
+MIT License - See LICENSE file for details
 
-## Contact
+## Support
 
-- **Author**: John Ruiz
-- **Email**: john.ruiz@tui.com
-- **Team**: ML Lab Incubator
+For questions and issues, please open a GitHub issue on this repository.
